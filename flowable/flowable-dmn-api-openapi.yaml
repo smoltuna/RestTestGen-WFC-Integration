@@ -1,0 +1,1800 @@
+openapi: 3.0.1
+info:
+  title: Flowable DMN REST API
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
+  contact:
+    name: Flowable
+    url: http://www.flowable.org/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: v1
+servers:
+- url: /flowable-rest/dmn-api
+tags:
+- name: DMN Decision Service
+- name: DMN Rule Service
+- name: Decision
+- name: Decision Tables
+- name: Decisions
+- name: Deployment
+- name: Engine
+- name: Historic Decision Executions
+paths:
+  /dmn-history/historic-decision-executions:
+    get:
+      tags:
+      - Historic Decision Executions
+      summary: List of historic decision executions
+      operationId: listHistoricDecisionExecutions
+      parameters:
+      - name: id
+        in: query
+        description: Only return historic decision executions with the given id.
+        schema:
+          type: string
+      - name: decisionDefinitionId
+        in: query
+        description: Only return historic decision executions with the given definition
+          id.
+        schema:
+          type: string
+      - name: deploymentId
+        in: query
+        description: Only return historic decision executions with the given deployment
+          id.
+        schema:
+          type: string
+      - name: decisionKey
+        in: query
+        description: Only return historic decision executions with the given decision
+          key.
+        schema:
+          type: string
+      - name: activityId
+        in: query
+        description: Only return historic decision executions with the given activity
+          id.
+        schema:
+          type: string
+      - name: executionId
+        in: query
+        description: Only return historic decision executions with the given execution
+          id.
+        schema:
+          type: string
+      - name: instanceId
+        in: query
+        description: Only return historic decision executions with the given instance
+          id.
+        schema:
+          type: string
+      - name: scopeType
+        in: query
+        description: Only return historic decision executions with the given scope
+          type.
+        schema:
+          type: string
+      - name: withoutScopeType
+        in: query
+        description: Only return historic decision executions without a scope type.
+        schema:
+          type: string
+      - name: processInstanceIdWithChildren
+        in: query
+        description: Return all historic decision executions with the given process
+          instance id or its entity link children.
+        schema:
+          type: string
+      - name: caseInstanceIdWithChildren
+        in: query
+        description: Return all historic decision executions with the given case instance
+          id or its entity link children.
+        schema:
+          type: string
+      - name: failed
+        in: query
+        description: Only return historic decision executions with the failed state.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: Only return historic decision executions with the given tenant
+          id.
+        schema:
+          type: string
+      - name: tenantIdLike
+        in: query
+        description: Only return historic decision executions like the given tenant
+          id.
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Property to sort on, to be used together with the order."
+        schema:
+          type: string
+          enum:
+          - startTime
+          - endTime
+          - tenantId
+      - name: order
+        in: query
+        description: "The sort order, either 'asc' or 'desc'. Defaults to 'asc'."
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Index of the first row to fetch. Defaults to 0.
+        schema:
+          type: integer
+      - name: size
+        in: query
+        description: "Number of rows to fetch, starting from start. Defaults to 10."
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Indicates request was successful and the historic decision
+            executions are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseHistoricDecisionExecutionResponse'
+        "400":
+          description: Indicates a parameter was passed in the wrong format. The status-message
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-history/historic-decision-executions/{historicDecisionExecutionId}:
+    get:
+      tags:
+      - Historic Decision Executions
+      summary: Get a historic decision execution
+      operationId: getHistoricDecisionExecution
+      parameters:
+      - name: historicDecisionExecutionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates request was successful and the historic decision
+            execution is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricDecisionExecutionResponse'
+        "404":
+          description: Indicates the requested historic decision execution was not
+            found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-history/historic-decision-executions/{historicDecisionExecutionId}/auditdata:
+    get:
+      tags:
+      - Historic Decision Executions
+      summary: Get a historic decision execution audit content
+      operationId: getHistoricDecisionExecutionAuditData
+      parameters:
+      - name: historicDecisionExecutionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates the historic decision execution has been found and
+            the audit data has been returned.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Indicates the requested historic decision execution was not
+            found. The status-description contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-management/engine:
+    get:
+      tags:
+      - Engine
+      summary: Get DMN engine info
+      description: Returns a read-only view of the DMN engine that is used in this
+        REST-service.
+      operationId: getEngineInfo
+      responses:
+        "200":
+          description: Indicates the engine info is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineInfoResponse'
+      security:
+      - basicAuth: []
+  /dmn-repository/decision-tables:
+    get:
+      tags:
+      - Decision Tables
+      summary: List of decision tables
+      operationId: listDecisionTables
+      parameters:
+      - name: category
+        in: query
+        description: Only return decision tables with the given category.
+        schema:
+          type: string
+      - name: categoryLike
+        in: query
+        description: Only return decision tables with a category like the given name.
+        schema:
+          type: string
+      - name: categoryNotEquals
+        in: query
+        description: Only return decision tables which do not have the given category.
+        schema:
+          type: string
+      - name: key
+        in: query
+        description: Only return decision tables with the given key.
+        schema:
+          type: string
+      - name: keyLike
+        in: query
+        description: Only return decision tables with a name like the given key.
+        schema:
+          type: string
+      - name: name
+        in: query
+        description: Only return decision tables with the given name.
+        schema:
+          type: string
+      - name: nameLike
+        in: query
+        description: Only return decision tables with a name like the given name.
+        schema:
+          type: string
+      - name: resourceName
+        in: query
+        description: Only return decision tables with the given resource name.
+        schema:
+          type: string
+      - name: resourceNameLike
+        in: query
+        description: Only return decision tables with a name like the given resource
+          name.
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Only return decision tables with the given version.
+        schema:
+          type: integer
+      - name: latest
+        in: query
+        description: "Only return the latest decision tables versions. Can only be\
+          \ used together with key and keyLike parameters, using any other parameter\
+          \ will result in a 400-response."
+        schema:
+          type: boolean
+      - name: deploymentId
+        in: query
+        description: Only return decision tables with the given category.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: Only return decision tables with the given tenant ID.
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Property to sort on, to be used together with the order."
+        schema:
+          type: string
+          enum:
+          - name
+          - id
+          - key
+          - category
+          - deploymentId
+          - version
+      - name: order
+        in: query
+        description: "The sort order, either 'asc' or 'desc'. Defaults to 'asc'."
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Index of the first row to fetch. Defaults to 0.
+        schema:
+          type: integer
+      - name: size
+        in: query
+        description: "Number of rows to fetch, starting from start. Defaults to 10."
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Indicates request was successful and the process-definitions
+            are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseDecisionResponse'
+        "400":
+          description: Indicates a parameter was passed in the wrong format or that
+            latest is used with other parameters other than key and keyLike. The status-message
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decision-tables/{decisionTableId}:
+    get:
+      tags:
+      - Decision Tables
+      summary: Get a decision table
+      operationId: getDecisionTable
+      parameters:
+      - name: decisionTableId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates request was successful and the decision table is
+            returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+        "404":
+          description: Indicates the requested decision table was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decision-tables/{decisionTableId}/model:
+    get:
+      tags:
+      - Decision Tables
+      summary: Get a decision table DMN (definition) model
+      operationId: getDecisionTableModel
+      parameters:
+      - name: decisionTableId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates the decision table was found and the model is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnDefinition'
+        "404":
+          description: Indicates the requested decision table was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decision-tables/{decisionTableId}/resourcedata:
+    get:
+      tags:
+      - Decision Tables
+      summary: Get a decision table resource content
+      operationId: getDecisionTableResource
+      parameters:
+      - name: decisionTableId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates both decision table and resource have been found
+            and the resource data has been returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+                  type: string
+                  format: byte
+        "404":
+          description: Indicates the requested decision table was not found or there
+            is no resource with the given id present in the decision table. The status-description
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decisions:
+    get:
+      tags:
+      - Decisions
+      summary: List of decision
+      operationId: listDecisions
+      parameters:
+      - name: category
+        in: query
+        description: Only return decision with the given category.
+        schema:
+          type: string
+      - name: categoryLike
+        in: query
+        description: Only return decision with a category like the given name.
+        schema:
+          type: string
+      - name: categoryNotEquals
+        in: query
+        description: Only return decision which do not have the given category.
+        schema:
+          type: string
+      - name: key
+        in: query
+        description: Only return decision with the given key.
+        schema:
+          type: string
+      - name: keyLike
+        in: query
+        description: Only return decision with a name like the given key.
+        schema:
+          type: string
+      - name: name
+        in: query
+        description: Only return decision with the given name.
+        schema:
+          type: string
+      - name: nameLike
+        in: query
+        description: Only return decision with a name like the given name.
+        schema:
+          type: string
+      - name: resourceName
+        in: query
+        description: Only return decision with the given resource name.
+        schema:
+          type: string
+      - name: resourceNameLike
+        in: query
+        description: Only return decision with a name like the given resource name.
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Only return decision with the given version.
+        schema:
+          type: integer
+      - name: latest
+        in: query
+        description: "Only return the latest decision versions. Can only be used together\
+          \ with key and keyLike parameters, using any other parameter will result\
+          \ in a 400-response."
+        schema:
+          type: boolean
+      - name: deploymentId
+        in: query
+        description: Only return decisions which are part of a deployment with the
+          given deployment id.
+        schema:
+          type: string
+      - name: parentDeploymentId
+        in: query
+        description: Only return decisions which are part of a deployment with the
+          given parent deployment id.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: Only return decision with the given tenant ID.
+        schema:
+          type: string
+      - name: decisionType
+        in: query
+        description: Only return decision with the given type.
+        schema:
+          type: string
+      - name: decisionTypeLike
+        in: query
+        description: Only return decision like the given type.
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Property to sort on, to be used together with the order."
+        schema:
+          type: string
+          enum:
+          - name
+          - id
+          - key
+          - category
+          - deploymentId
+          - version
+          - decisionType
+      - name: order
+        in: query
+        description: "The sort order, either 'asc' or 'desc'. Defaults to 'asc'."
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Index of the first row to fetch. Defaults to 0.
+        schema:
+          type: integer
+      - name: size
+        in: query
+        description: "Number of rows to fetch, starting from start. Defaults to 10."
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Indicates request was successful and the process-definitions
+            are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseDecisionResponse'
+        "400":
+          description: Indicates a parameter was passed in the wrong format or that
+            latest is used with other parameters other than key and keyLike. The status-message
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decisions/{decisionId}:
+    get:
+      tags:
+      - Decisions
+      summary: Get a decision
+      operationId: getDecision
+      parameters:
+      - name: decisionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates request was successful and the decision is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+        "404":
+          description: Indicates the requested decision was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decisions/{decisionId}/image:
+    get:
+      tags:
+      - Decisions
+      summary: Get a decision requirements diagram image
+      operationId: getImageResource
+      parameters:
+      - name: decisionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates request was successful and the decision requirements
+            diagram image returned
+          content:
+            image/png:
+              schema:
+                type: array
+                items:
+                  pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+                  type: string
+                  format: byte
+        "404":
+          description: Indicates the requested decision requirements diagram image
+            was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decisions/{decisionId}/model:
+    get:
+      tags:
+      - Decisions
+      summary: Get a decision DMN (definition) model
+      operationId: getDecisionModel
+      parameters:
+      - name: decisionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates the decision was found and the model is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnDefinition'
+        "404":
+          description: Indicates the requested decision was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/decisions/{decisionId}/resourcedata:
+    get:
+      tags:
+      - Decisions
+      summary: Get a decision resource content
+      operationId: getDecisionResource
+      parameters:
+      - name: decisionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates both decision and resource have been found and the
+            resource data has been returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+                  type: string
+                  format: byte
+        "404":
+          description: Indicates the requested decision was not found or there is
+            no resource with the given id present in the decision . The status-description
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/deployments:
+    get:
+      tags:
+      - Deployment
+      summary: List of decision deployments
+      operationId: listDecisionDeployments
+      parameters:
+      - name: name
+        in: query
+        description: Only return decision deployments with the given name.
+        schema:
+          type: string
+      - name: nameLike
+        in: query
+        description: Only return decision deployments with a name like the given name.
+        schema:
+          type: string
+      - name: category
+        in: query
+        description: Only return decision deployments with the given category.
+        schema:
+          type: string
+      - name: categoryNotEquals
+        in: query
+        description: Only return decision deployments which do not have the given
+          category.
+        schema:
+          type: string
+      - name: parentDeploymentId
+        in: query
+        description: Only return decision deployments with the given parent deployment
+          id.
+        schema:
+          type: string
+      - name: parentDeploymentIdLike
+        in: query
+        description: Only return decision deployments with a parent deployment id
+          like the given value.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: Only return decision deployments with the given tenantId.
+        schema:
+          type: string
+      - name: tenantIdLike
+        in: query
+        description: Only return decision deployments with a tenantId like the given
+          value.
+        schema:
+          type: string
+      - name: withoutTenantId
+        in: query
+        description: "If true, only returns decision deployments without a tenantId\
+          \ set. If false, the withoutTenantId parameter is ignored."
+        schema:
+          type: boolean
+      - name: sort
+        in: query
+        description: "Property to sort on, to be used together with the order."
+        schema:
+          type: string
+          enum:
+          - id
+          - name
+          - deployTime
+          - tenantId
+      - name: order
+        in: query
+        description: "The sort order, either 'asc' or 'desc'. Defaults to 'asc'."
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Index of the first row to fetch. Defaults to 0.
+        schema:
+          type: integer
+      - name: size
+        in: query
+        description: "Number of rows to fetch, starting from start. Defaults to 10."
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Indicates the request was successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponseDmnDeploymentResponse'
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - Deployment
+      summary: Create a new decision deployment
+      description: |-
+        The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. If multiple resources need to be deployed in a single deployment, compress the resources in a zip and make sure the file-name ends with .bar or .zip.
+
+        An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.
+      operationId: uploadDecisionDeployment
+      parameters:
+      - name: tenantId
+        in: query
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Indicates the deployment was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnDeploymentResponse'
+        "400":
+          description: Indicates there was no content present in the request body
+            or the content mime-type is not supported for deployment. The status-description
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/deployments/{deploymentId}:
+    get:
+      tags:
+      - Deployment
+      summary: Get a decision deployment
+      operationId: getDecisionDeployment
+      parameters:
+      - name: deploymentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates the deployment was found and returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnDeploymentResponse'
+        "404":
+          description: Indicates the requested deployment was not found.
+          content: {}
+      security:
+      - basicAuth: []
+    delete:
+      tags:
+      - Deployment
+      summary: Delete a decision deployment
+      operationId: deleteDecisionDeployment
+      parameters:
+      - name: deploymentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Indicates the deployment was found and has been deleted. Response-body
+            is intentionally empty.
+          content: {}
+        "404":
+          description: Indicates the requested deployment was not found.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-repository/deployments/{deploymentId}/resourcedata/{resourceName}:
+    get:
+      tags:
+      - Deployment
+      summary: Get a decision deployment resource content
+      description: "The response body will contain the binary resource-content for\
+        \ the requested resource. The response content-type will be the same as the\
+        \ type returned in the resources mimeType property. Also, a content-disposition\
+        \ header is set, allowing browsers to download the file instead of displaying\
+        \ it."
+      operationId: getDecisionTableDeploymentResource
+      parameters:
+      - name: deploymentId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: resourceName
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Indicates both deployment and resource have been found and
+            the resource data has been returned.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+                  type: string
+                  format: byte
+        "404":
+          description: Indicates the requested deployment was not found or there is
+            no resource with the given id present in the deployment. The status-description
+            contains additional information.
+          content: {}
+      security:
+      - basicAuth: []
+  /dmn-rule/execute:
+    post:
+      tags:
+      - DMN Rule Service
+      summary: Execute a Decision
+      operationId: execute
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the Decision has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceResponse'
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /dmn-rule/execute-decision:
+    post:
+      tags:
+      - DMN Decision Service
+      summary: Execute a decision
+      operationId: executeDecision
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the decision has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceResponse'
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /dmn-rule/execute-decision-service:
+    post:
+      tags:
+      - DMN Decision Service
+      summary: Execute a decision service
+      operationId: executeDecisionService
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the decision service has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceResponse'
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /dmn-rule/execute-decision-service/single-result:
+    post:
+      tags:
+      - DMN Decision Service
+      summary: Execute a decision service expecting a single result
+      operationId: executeDecisionServiceWithSingleResult
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the decision service has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceSingleResponse'
+        "500":
+          description: Indicates the decision service returned multiple results
+          content: {}
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /dmn-rule/execute-decision/single-result:
+    post:
+      tags:
+      - DMN Decision Service
+      summary: Execute a decision expecting a single result
+      operationId: executeDecisionWithSingleResult
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the decision or decision service has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceSingleResponse'
+        "500":
+          description: Indicates the decision returned multiple results
+          content: {}
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /dmn-rule/execute/single-result:
+    post:
+      tags:
+      - DMN Rule Service
+      summary: Execute a decision or a decision service expecting a single result
+      operationId: executeWithSingleResult
+      requestBody:
+        description: request
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DmnRuleServiceRequest'
+        required: false
+      responses:
+        "201":
+          description: Indicates the decision or decision service has been executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DmnRuleServiceSingleResponse'
+        "500":
+          description: Indicates the decision or decision service returned multiple
+            results
+          content: {}
+      security:
+      - basicAuth: []
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    AuthorityRequirement:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        requiredDecision:
+          $ref: '#/components/schemas/DmnElementReference'
+        requiredInput:
+          $ref: '#/components/schemas/DmnElementReference'
+        requiredAuthority:
+          $ref: '#/components/schemas/DmnElementReference'
+    DataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties: {}
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+    DataResponseDecisionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DecisionResponse'
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+    DataResponseDmnDeploymentResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmnDeploymentResponse'
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+    DataResponseHistoricDecisionExecutionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoricDecisionExecutionResponse'
+        total:
+          type: integer
+          format: int64
+        start:
+          type: integer
+          format: int32
+        sort:
+          type: string
+        order:
+          type: string
+        size:
+          type: integer
+          format: int32
+    Decision:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        question:
+          type: string
+        allowedAnswers:
+          type: string
+        variable:
+          $ref: '#/components/schemas/InformationItem'
+        requiredDecisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/InformationRequirement'
+        requiredInputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InformationRequirement'
+        authorityRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorityRequirement'
+        expression:
+          $ref: '#/components/schemas/Expression'
+        forceDMN11:
+          type: boolean
+    DecisionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 46b0379c-c0a1-11e6-bc93-6ab56fad108a
+        url:
+          type: string
+          example: http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decisions/46b0379c-c0a1-11e6-bc93-6ab56fad108a
+        category:
+          type: string
+          example: dmnTest
+        name:
+          type: string
+          example: Decision Table One
+        key:
+          type: string
+          example: DecisionTableOne
+        description:
+          type: string
+          example: This is a simple description
+        version:
+          type: integer
+          format: int32
+          example: 3
+        resourceName:
+          type: string
+          example: dmn-DecisionTableOne.dmn
+        deploymentId:
+          type: string
+          example: 46aa6b3a-c0a1-11e6-bc93-6ab56fad108a
+        tenantId:
+          type: string
+          example: "null"
+        decisionType:
+          type: string
+          example: decision_table
+    DecisionService:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        outputDecisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmnElementReference'
+        encapsulatedDecisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmnElementReference'
+        inputDecisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmnElementReference'
+        inputData:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmnElementReference'
+    DmnDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        expressionLanguage:
+          type: string
+        typeLanguage:
+          type: string
+        namespace:
+          type: string
+        exporter:
+          type: string
+        exporterVersion:
+          type: string
+        inputData:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputData'
+        itemDefinitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemDefinition'
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Decision'
+        decisionServices:
+          type: array
+          items:
+            $ref: '#/components/schemas/DecisionService'
+        locationMap:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/GraphicInfo'
+        locationByDiagramIdMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/GraphicInfo'
+        labelLocationByDiagramIdMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/GraphicInfo'
+        flowLocationMap:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/GraphicInfo'
+        flowLocationByDiagramIdMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: '#/components/schemas/GraphicInfo'
+        decisionServiceDividerLocationMap:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/GraphicInfo'
+        decisionServiceDividerLocationByDiagramIdMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: '#/components/schemas/GraphicInfo'
+        namespaces:
+          type: object
+          additionalProperties:
+            type: string
+        diDiagramMap:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/DmnDiDiagram'
+    DmnDeploymentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 03ab310d-c1de-11e6-a4f4-62ce84ef239e
+        name:
+          type: string
+          example: dmnTest
+        deploymentTime:
+          type: string
+          format: date-time
+          example: 2016-12-14T10:16:37+01:00
+        category:
+          type: string
+          example: dmnExamples
+        url:
+          type: string
+          example: http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e
+        parentDeploymentId:
+          type: string
+          example: "17510"
+        tenantId:
+          type: string
+          example: "null"
+    DmnDiDiagram:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        graphicInfo:
+          $ref: '#/components/schemas/GraphicInfo'
+    DmnElement:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+    DmnElementReference:
+      type: object
+      properties:
+        href:
+          type: string
+        parsedId:
+          type: string
+    DmnExtensionAttribute:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        namespacePrefix:
+          type: string
+        namespace:
+          type: string
+    DmnExtensionElement:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        namespacePrefix:
+          type: string
+        namespace:
+          type: string
+        elementText:
+          type: string
+        childElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+    DmnRuleServiceRequest:
+      type: object
+      properties:
+        decisionKey:
+          type: string
+        tenantId:
+          type: string
+        parentDeploymentId:
+          type: string
+        inputVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineRestVariable'
+    DmnRuleServiceResponse:
+      type: object
+      properties:
+        resultVariables:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EngineRestVariable'
+        url:
+          type: string
+    DmnRuleServiceSingleResponse:
+      type: object
+      properties:
+        resultVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineRestVariable'
+        url:
+          type: string
+    EngineInfoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: default
+        resourceUrl:
+          type: string
+          example: file://flowable/flowable.cfg.xml
+        exception:
+          type: string
+          example: "null"
+        version:
+          type: string
+          example: 6.3.1
+    EngineRestVariable:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the variable
+          example: myVariable
+        type:
+          type: string
+          description: Type of the variable.
+          example: string
+        value:
+          type: object
+          properties: {}
+          description: Value of the variable.
+          example: test
+        valueUrl:
+          type: string
+          example: http://....
+    Expression:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        typeRef:
+          type: string
+    GraphicInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        x:
+          type: number
+          format: double
+        "y":
+          type: number
+          format: double
+        height:
+          type: number
+          format: double
+        width:
+          type: number
+          format: double
+        element:
+          $ref: '#/components/schemas/DmnElement'
+        expanded:
+          type: boolean
+        xmlRowNumber:
+          type: integer
+          format: int32
+        xmlColumnNumber:
+          type: integer
+          format: int32
+    HistoricDecisionExecutionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        decisionDefinitionId:
+          type: string
+        deploymentId:
+          type: string
+        activityId:
+          type: string
+        executionId:
+          type: string
+        instanceId:
+          type: string
+        scopeType:
+          type: string
+        failed:
+          type: boolean
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        tenantId:
+          type: string
+        decisionKey:
+          type: string
+        decisionName:
+          type: string
+        decisionVersion:
+          type: string
+    InformationItem:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        typeRef:
+          type: string
+    InformationRequirement:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        requiredDecision:
+          $ref: '#/components/schemas/DmnElementReference'
+        requiredInput:
+          $ref: '#/components/schemas/DmnElementReference'
+    InputData:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        variable:
+          $ref: '#/components/schemas/InformationItem'
+    ItemDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        name:
+          type: string
+        typeRef:
+          type: string
+        allowedValues:
+          $ref: '#/components/schemas/UnaryTests'
+        itemComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemDefinition'
+        typeLanguage:
+          type: string
+        collection:
+          type: boolean
+    UnaryTests:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        extensionElements:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionElement'
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/DmnExtensionAttribute'
+        text:
+          type: string
+        textValues:
+          type: array
+          items:
+            type: object
+            properties: {}
+        expressionLanguage:
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+x-original-swagger-version: "2.0"

@@ -1,0 +1,303 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Alfresco Content Services REST API",
+    "description": "**Discovery API**\n\nProvides access to information about Alfresco Content Services.\n",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/alfresco/api"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/discovery": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Get repository information",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nRetrieves the capabilities and detailed version information from the repository.\n",
+        "operationId": "getRepositoryInformation",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryEntry"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Discovery is disabled for the system",
+            "content": {}
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "5.2"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "required": [
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "required": [
+              "briefSummary",
+              "descriptionURL",
+              "stackTrace",
+              "statusCode"
+            ],
+            "type": "object",
+            "properties": {
+              "errorKey": {
+                "type": "string"
+              },
+              "statusCode": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "briefSummary": {
+                "type": "string"
+              },
+              "stackTrace": {
+                "type": "string"
+              },
+              "descriptionURL": {
+                "type": "string"
+              },
+              "logId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "VersionInfo": {
+        "required": [
+          "display",
+          "hotfix",
+          "label",
+          "major",
+          "minor",
+          "patch",
+          "schema"
+        ],
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "string"
+          },
+          "minor": {
+            "type": "string"
+          },
+          "patch": {
+            "type": "string"
+          },
+          "hotfix": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string"
+          },
+          "display": {
+            "type": "string"
+          }
+        }
+      },
+      "StatusInfo": {
+        "required": [
+          "isAuditEnabled",
+          "isQuickShareEnabled",
+          "isReadOnly",
+          "isThumbnailGenerationEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "isReadOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "isAuditEnabled": {
+            "type": "boolean"
+          },
+          "isQuickShareEnabled": {
+            "type": "boolean"
+          },
+          "isThumbnailGenerationEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EntitlementsInfo": {
+        "type": "object",
+        "properties": {
+          "maxUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxDocs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "isClusterEnabled": {
+            "type": "boolean",
+            "default": false
+          },
+          "isCryptodocEnabled": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "LicenseInfo": {
+        "required": [
+          "expiresAt",
+          "holder",
+          "issuedAt",
+          "mode",
+          "remainingDays"
+        ],
+        "type": "object",
+        "properties": {
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "remainingDays": {
+            "type": "integer"
+          },
+          "holder": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "entitlements": {
+            "$ref": "#/components/schemas/EntitlementsInfo"
+          }
+        }
+      },
+      "ModuleInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "installDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "installState": {
+            "type": "string"
+          },
+          "versionMin": {
+            "type": "string"
+          },
+          "versionMax": {
+            "type": "string"
+          }
+        }
+      },
+      "RepositoryInfo": {
+        "required": [
+          "edition",
+          "id",
+          "status",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "edition": {
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/VersionInfo"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusInfo"
+          },
+          "license": {
+            "$ref": "#/components/schemas/LicenseInfo"
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleInfo"
+            }
+          }
+        }
+      },
+      "RepositoryEntry": {
+        "required": [
+          "repository"
+        ],
+        "type": "object",
+        "properties": {
+          "repository": {
+            "$ref": "#/components/schemas/RepositoryInfo"
+          }
+        }
+      },
+      "DiscoveryEntry": {
+        "required": [
+          "entry"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/RepositoryEntry"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "description": "HTTP Basic Authentication",
+        "scheme": "basic"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}

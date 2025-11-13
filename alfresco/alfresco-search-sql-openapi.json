@@ -1,0 +1,234 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Alfresco Insight Engine REST API",
+    "description": "**Search SQL API**\nA Solr SQL passthrough, this feature provides the ability to use SQL to query Solr.\n",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/alfresco/api/-default-/public/search/versions/1"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/sql": {
+      "post": {
+        "tags": [
+          "sql"
+        ],
+        "summary": "Alfresco Insight Engine SQL Passthrough",
+        "description": "**Note**: this endpoint is available in Alfresco 6.0 and newer versions.\nThis will require Insight Engine and will not work with Alfresco Search Services.\n\n**You specify all the parameters in this API in a JSON body**,\nA basic query looks like this:\n\n```JSON\n{\n  \"stmt\": \"select * from alfresco\",\n  \"locales\": [\"en_UK\"],\n  \"timezone\": \"Europe/London\",\n  \"includeMetadata\":true\n}\n```\n\n**Note:** the minimum possible query parameter required.\n```JSON\n{\n  \"stmt\":\n}\n```\nThe expected reponse will appear in the Alfresco format as seen below.\n```JSON\n{\n  \"list\": {\n    \"pagination\": {\n      \"count\": 1,\n      \"hasMoreItems\": false,\n      \"totalItems\": 1,\n      \"skipCount\": 0,\n      \"maxItems\": 100\n  },\n  \"entries\": [{\n    \"entry\": [\n      {\n        \"label\": \"aliases\",\n        \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"\n      },\n      {\n        \"label\": \"isMetadata\",\n        \"value\": \"true\"\n      },\n      {\n        \"label\": \"fields\",\n        \"value\": \"[\\\"SITE\\\"]\"\n      }\n    ]\n  }]}}\n  ```\n  To override the default format set the format to solr.\n  ```JSON\n  {\n    \"stmt\": \"select * from alfresco\",\n    \"format\": \"solr\"\n  }\n```\nThis will return Solr's output response.\n```JSON\n{\n  \"result-set\": {\n  \"docs\": [\n    {\n      \"aliases\": {\n      \"SITE\": \"site\"\n    },\n      \"isMetadata\": true,\n      \"fields\": [ \"SITE\"]\n    },\n    {\n        \"RESPONSE_TIME\": 23,\n        \"EOF\": true\n    }\n  ]}\n}\n```\n\n\nYou can use the **locales parameter** to filter results based on locale.\n```JSON\n\"locales\": [\"en_UK\", \"en_US\"]\n```\n\nTo include timezone in the query add the **timezone parameter**.\n```JSON\n\"timezone\": \"Japan\"\n```\n\nTo include custom filter queries add the **filterQueries parameter**.\n```JSON\n\"filterQueries\": [\"-SITE:swsdp\"]\n```\n\nYou can use the **includeMetadata parameter** to include addtional  information, this is by default set to false.\n\n```JSON\n\"includeMetadata\": \"false\"\n```\nPlease note that if its set to true the first entry will represent the metdata requested\n\n ```JSON\n {\n   \"stmt\": \"select site from alfresco limit 2\",\n   \"includeMetadata\":true\n }\n```\nThe expected response:\n```JSON\n\"entries\": [\n  {\n    #First entry holds the Metadata infromation as set by {includeMetadata:true}\n    \"entry\": [\n      {\n        \"label\": \"aliases\",\n        \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"\n\n      },\n      {\n        \"label\": \"isMetadata\",\n        \"value\": \"true\"\n      },\n      {\n        \"label\": \"fields\",\n        \"value\": \"[\\\"SITE\\\"]\"\n      }\n    ]\n    #end of Metadata\n  },\n  {\n    #Query result entry value.\n    \"entry\": [\n      {\n        \"label\": \"site\",\n        \"value\": \"[\\\"test\\\"]\"\n      }\n    ]\n  },\n  {\n    \"entry\": [\n    {\n      \"label\": \"site\",\n      \"value\": \"[\\\"test\\\"]\"\n    }\n    ]\n  }\n]\n```\n",
+        "operationId": "search",
+        "requestBody": {
+          "description": "Generic query API\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SQLSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SQLResultSetPaging"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "6.0",
+        "x-codegen-request-body-name": "queryBody"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "required": [
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "required": [
+              "briefSummary",
+              "descriptionURL",
+              "stackTrace",
+              "statusCode"
+            ],
+            "type": "object",
+            "properties": {
+              "errorKey": {
+                "type": "string"
+              },
+              "statusCode": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "briefSummary": {
+                "type": "string"
+              },
+              "stackTrace": {
+                "type": "string"
+              },
+              "descriptionURL": {
+                "type": "string"
+              },
+              "logId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SQLSearchRequest": {
+        "type": "object",
+        "properties": {
+          "stmt": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "locales": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "filterQueries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeMetadata": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SQLResultSetPaging": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SQLResultSetRowEntry"
+                }
+              }
+            }
+          }
+        },
+        "description": "Query results"
+      },
+      "Pagination": {
+        "required": [
+          "count",
+          "hasMoreItems",
+          "maxItems",
+          "skipCount"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "The number of objects in the entries array.\n",
+            "format": "int64"
+          },
+          "hasMoreItems": {
+            "type": "boolean",
+            "description": "A boolean value which is **true** if there are more entities in the collection\nbeyond those in this response. A true value means a request with a larger value\nfor the **skipCount** or the **maxItems** parameter will return more entities.\n"
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "An integer describing the total number of entities in the collection.\nThe API might not be able to determine this value,\nin which case this property will not be present.\n",
+            "format": "int64"
+          },
+          "skipCount": {
+            "type": "integer",
+            "description": "An integer describing how many entities exist in the collection before\nthose included in this list.\n",
+            "format": "int64"
+          },
+          "maxItems": {
+            "type": "integer",
+            "description": "The value of the **maxItems** parameter used to generate this list,\nor if there was no **maxItems** parameter the default value is 100\n",
+            "format": "int64"
+          }
+        }
+      },
+      "SQLResultSetRowEntry": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "SolrResultSet": {
+        "type": "object",
+        "properties": {
+          "result-set": {
+            "$ref": "#/components/schemas/docs"
+          }
+        },
+        "description": "SQL results in Solr formatting"
+      },
+      "docs": {
+        "type": "array",
+        "description": "Array of documents returned by the query, note that this is a Solr convention.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "description": "HTTP Basic Authentication",
+        "scheme": "basic"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}
