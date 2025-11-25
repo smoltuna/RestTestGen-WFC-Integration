@@ -1,0 +1,53 @@
+services:
+  quartzmanager-db:
+    container_name: quartzmanager-db
+    image: postgres:14.5
+    restart: always
+    environment:
+      POSTGRES_DB: quartzmanager
+      POSTGRES_USER: quartzmanager
+      POSTGRES_PASSWORD: quartzmanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quartzmanager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - quartzmanager-network
+
+  quartzmanager-api:
+    container_name: quartzmanager-restgym
+    build:
+      context: ../../..
+      dockerfile: RESTgym/apis/quartzmanager/Dockerfile
+    restart: always
+    depends_on:
+      quartzmanager-db:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+      - "12345:12345"
+      - "8080:8080"
+    environment:
+      API: quartzmanager
+      TOOL: manual
+      RUN: 1
+      QUARTZ_MANAGER_OAS_ENABLED: "true"
+      QUARTZ_MANAGER_DB_URL: "jdbc:postgresql://quartzmanager-db:5432/quartzmanager"
+      QUARTZ_MANAGER_DB_USER: "quartzmanager"
+      QUARTZ_MANAGER_DB_PASSWORD: "quartzmanager"
+    volumes:
+      - ./results:/results
+    networks:
+      - quartzmanager-network
+
+volumes:
+  postgres_data:
+
+networks:
+  quartzmanager-network:
+    driver: bridge

@@ -26,8 +26,3 @@ class StoreInteractions:
             self.conn.commit()
 
 addons = [StoreInteractions()]
-
-
-
-
-

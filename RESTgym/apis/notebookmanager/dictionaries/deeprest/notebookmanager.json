@@ -1,0 +1,61 @@
+{
+  "GET /api/notebooks": {
+    "page": ["0", "1", "2", "5", "10", "100", "-1", "999999"],
+    "pageSize": ["1", "5", "10", "20", "50", "100", "1000", "-1", "0"]
+  },
+  "POST /api/notebooks": {
+    "name": [
+      "Asus Vivo Book S", "HP Inspiron", "Dell Magic", "Apple MacBook", 
+      "LG D230", "Acer P700", "Lenovo ThinkPad", "Microsoft Surface", 
+      "Samsung Galaxy Book", "Huawei MateBook", "Xiaomi Mi Notebook",
+      "Test Notebook", "Special@Notebook!", "Notebook#123", "日本語ノート",
+      "", "a", "very_long_notebook_name_with_many_characters_exceeding_normal_limits_to_test_validation",
+      "123", "null", "undefined", "<script>alert('xss')</script>",
+      "'; DROP TABLE note_book; --", "../../etc/passwd", "%00null"
+    ],
+    "currentPrice": [
+      "0.0", "0.01", "1.0", "99.99", "100.0", "199.9", "211.9", "299.9", 
+      "300.0", "500.0", "709.9", "999.99", "1000.0", "9999.99", "99999.99",
+      "-1.0", "-100.0", "0", "Infinity", "NaN", "null", "1e10", "1.23456789"
+    ]
+  },
+  "GET /api/notebooks/{notebookId}": {
+    "notebookId": [
+      "1", "2", "3", "4", "5", "6", "7", "10", "100", "999", "9999",
+      "0", "-1", "-100", "null", "undefined", "abc", "1.5", 
+      "999999999", "2147483647", "-2147483648", "%00", "../", 
+      "'; DROP TABLE note_book; --", "<script>", "' OR '1'='1"
+    ]
+  },
+  "PATCH /api/notebooks/{notebookId}": {
+    "notebookId": [
+      "1", "2", "3", "4", "5", "6", "7", "10", "100", "999",
+      "0", "-1", "null", "abc", "999999999"
+    ],
+    "name": [
+      "Updated Notebook", "New Name", "Modified", "Changed",
+      "Asus Vivo Book S Updated", "Test Update", "!@#$%^&*()",
+      "", "null", "<script>", "' OR '1'='1"
+    ],
+    "currentPrice": [
+      "0.0", "1.0", "50.0", "100.0", "150.0", "200.0", "500.0", "1000.0",
+      "-1.0", "0", "999999.99", "Infinity", "NaN", "null"
+    ]
+  },
+  "DELETE /api/notebooks/{notebookId}": {
+    "notebookId": [
+      "1", "2", "3", "4", "5", "6", "7", "10", "100", "999",
+      "0", "-1", "null", "abc", "999999999", "' OR '1'='1"
+    ]
+  },
+  "common_values": {
+    "integers": ["0", "1", "2", "5", "10", "100", "1000", "-1", "-100", "999999", "2147483647", "-2147483648"],
+    "floats": ["0.0", "1.0", "99.99", "100.0", "999.99", "-1.0", "-100.0", "1.23456789", "Infinity", "NaN"],
+    "strings": ["test", "TEST", "Test", "t3st", "123", "!@#$", "", " ", "null", "undefined"],
+    "special_chars": ["'", "\"", "<", ">", "&", "%", "\\", "/", ".."],
+    "sql_injection": ["' OR '1'='1", "'; DROP TABLE note_book; --", "' UNION SELECT * FROM note_book--"],
+    "xss": ["<script>alert('xss')</script>", "<img src=x onerror=alert(1)>", "javascript:alert(1)"],
+    "path_traversal": ["../", "../../etc/passwd", "..\\..\\windows\\system32"],
+    "null_bytes": ["%00", "\\x00", "null\\x00byte"]
+  }
+}
