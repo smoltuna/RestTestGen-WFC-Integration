@@ -1,0 +1,96 @@
+{
+  "device_ids": [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 999, 1000, 9999, 10000, -1, 0, 2147483647, -2147483648],
+  "user_ids": [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 999, 1000, -1, 0],
+  "group_ids": [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, -1, 0],
+  "position_ids": [1, 2, 3, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, -1, 0],
+  "event_ids": [1, 2, 3, 5, 10, 50, 100, 500, 1000, -1, 0],
+  "geofence_ids": [1, 2, 3, 4, 5, 10, 20, 50, 100, -1, 0],
+  "calendar_ids": [1, 2, 3, 4, 5, 10, 20, -1, 0],
+  "notification_ids": [1, 2, 3, 4, 5, 10, 20, -1, 0],
+  "command_ids": [1, 2, 3, 4, 5, 10, 20, 50, -1, 0],
+  "attribute_ids": [1, 2, 3, 4, 5, 10, 20, -1, 0],
+  "driver_ids": [1, 2, 3, 4, 5, 10, 20, -1, 0],
+  "maintenance_ids": [1, 2, 3, 4, 5, 10, 20, -1, 0],
+  
+  "device_names": ["Device1", "Device2", "TestDevice", "GPS-Tracker-001", "VehicleGPS", "FleetTruck01", "PersonalTracker", "CompanyCar", "Mobile-Device", "Tracker123", "Unit-A", "Unit-B", "Emergency-Vehicle", "Delivery-Van", "Patrol-Car", "Asset-Tracker", "FieldWorker", "Service-Vehicle", "test", "admin-device"],
+  
+  "device_unique_ids": ["123456789012345", "111111111111111", "999999999999999", "001122334455667", "ABCDEF123456789", "imei:123456789012345", "354678901234567", "867890123456789", "test-unique-id", "demo-device-001", "tracker-serial-123", "gps-unit-456", "vehicle-id-789", "asset-tag-001", "mobile-imei-999"],
+  
+  "device_categories": ["car", "truck", "van", "motorcycle", "bus", "bicycle", "person", "animal", "boat", "aircraft", "default", "tractor", "crane", "pickup", "suv", "sedan", "trailer"],
+  
+  "device_protocols": ["osmand", "gps103", "tk103", "gl200", "gl300", "t55", "xexun", "totem", "enfora", "meiligao", "trv", "suntech", "progress", "h02", "jt600", "huabao", "v680", "pt502", "tr20", "naviset", "xt013", "xt7", "wondex", "cellocator", "galileo"],
+  
+  "user_names": ["admin", "user", "test", "demo", "manager", "operator", "viewer", "dispatcher", "supervisor", "analyst", "technician", "driver1", "driver2", "john.doe", "jane.smith", "fleet-manager", "guest", "readonly", "power-user", "support"],
+  
+  "user_emails": ["admin@traccar.org", "user@example.com", "test@test.com", "demo@demo.com", "manager@company.com", "operator@fleet.com", "john.doe@example.com", "jane.smith@company.com", "contact@traccar.org", "support@example.com", "info@tracker.com", "fleet@company.com", "dispatch@logistics.com"],
+  
+  "passwords": ["admin", "password", "12345", "test123", "admin123", "password123", "user123", "demo123", "tracker", "gps123", "fleet2023", "secure123", "changeme", "welcome", "qwerty"],
+  
+  "group_names": ["Group1", "Group2", "AllDevices", "FleetA", "FleetB", "Region-North", "Region-South", "Department-1", "TestGroup", "VehicleGroup", "PersonalTrackers", "CompanyAssets", "Emergency", "Delivery", "Sales-Team"],
+  
+  "geofence_names": ["Headquarters", "Warehouse", "Depot", "Office", "Home", "Region1", "Zone-A", "Zone-B", "Restricted-Area", "Safe-Zone", "Geofence1", "City-Center", "Industrial-Park", "Customer-Site", "Service-Area", "No-Go-Zone"],
+  
+  "geofence_areas": ["CIRCLE (30.5234 -97.6789, 500)", "POLYGON ((30.5 -97.7, 30.6 -97.7, 30.6 -97.6, 30.5 -97.6, 30.5 -97.7))", "CIRCLE (40.7128 -74.0060, 1000)", "CIRCLE (51.5074 -0.1278, 750)", "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"],
+  
+  "command_types": ["custom", "positionSingle", "positionPeriodic", "positionStop", "engineStop", "engineResume", "alarmArm", "alarmDisarm", "setTimezone", "requestPhoto", "rebootDevice", "sendSms", "sendUssd", "sosNumber", "silenceTime", "setPhonebook", "voiceMessage", "outputControl", "voiceMonitoring", "setAgps", "setIndicator", "configuration", "getVersion", "firmwareUpdate", "setConnection", "setOdometer", "modePowerSaving", "modeDeepSleep", "modeNormal", "movementAlarm"],
+  
+  "notification_types": ["deviceOnline", "deviceUnknown", "deviceOffline", "deviceInactive", "deviceMoving", "deviceStopped", "deviceOverspeed", "deviceFuelDrop", "deviceFuelIncrease", "commandResult", "geofenceEnter", "geofenceExit", "alarm", "ignitionOn", "ignitionOff", "maintenance", "textMessage", "driverChanged", "media"],
+  
+  "notification_channels": ["web", "mail", "sms", "firebase", "telegram", "traccar", "webhook"],
+  
+  "calendar_names": ["WorkingDays", "Weekends", "BusinessHours", "Night-Shift", "24-7", "Maintenance-Schedule", "Holiday-Calendar", "Custom-Schedule"],
+  
+  "attribute_names": ["customAttribute1", "fuelLevel", "temperature", "humidity", "batteryLevel", "speed", "altitude", "heading", "satellites", "signalStrength", "odometer", "engineHours", "driverName", "customData", "sensorValue"],
+  
+  "attribute_expressions": ["speed > 100", "fuel < 10", "temperature > 50", "batteryLevel < 20", "odometer", "speed * 1.60934", "io1 == 1", "alarm != null", "ignition"],
+  
+  "driver_names": ["John Smith", "Jane Doe", "Driver1", "Driver2", "Mike Johnson", "Sarah Wilson", "Robert Brown", "Emily Davis", "TestDriver", "UnknownDriver"],
+  
+  "driver_unique_ids": ["DRV001", "DRV002", "12345678", "DRIVER-001", "ABC123", "LICENSE-001", "BADGE-001", "ID-12345"],
+  
+  "maintenance_names": ["Oil Change", "Tire Rotation", "Brake Inspection", "Annual Service", "Engine Check", "Battery Replacement", "Filter Change", "General Maintenance", "Scheduled-Service", "Emergency-Repair"],
+  
+  "report_types": ["route", "events", "summary", "trips", "stops"],
+  
+  "date_times": ["2024-01-01T00:00:00Z", "2024-06-15T12:00:00Z", "2024-12-31T23:59:59Z", "2023-01-01T00:00:00Z", "2025-01-01T00:00:00Z", "2024-03-15T08:30:00Z", "2024-07-04T14:45:00Z"],
+  
+  "time_intervals": ["1963-11-22T18:30:00Z", "2024-01-01T00:00:00Z", "2024-01-01T23:59:59Z", "2024-06-01T00:00:00Z", "2024-06-30T23:59:59Z", "2024-12-01T00:00:00Z", "2024-12-31T23:59:59Z"],
+  
+  "latitudes": [0, 30.5234, 40.7128, 51.5074, -33.8688, 35.6762, -23.5505, 48.8566, 55.7558, -37.8136, 1.3521, 37.7749, 41.9028, -34.6037, 13.7563, 19.4326, 25.2048, 31.2304],
+  
+  "longitudes": [0, -97.6789, -74.0060, -0.1278, 151.2093, 139.6503, -46.6333, 2.3522, 37.6173, 144.9631, 103.8198, -122.4194, 12.4964, -58.3816, 100.5018, -99.1332, 55.2708, 121.4737],
+  
+  "speeds": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250],
+  
+  "courses": [0, 45, 90, 135, 180, 225, 270, 315, 360, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5],
+  
+  "altitudes": [0, 100, 200, 500, 1000, 1500, 2000, 3000, 5000, 10000, -100, -500],
+  
+  "accuracies": [0, 5, 10, 15, 20, 25, 50, 100, 200, 500, 1000],
+  
+  "boolean_values": [true, false],
+  
+  "refresh_values": [true, false],
+  
+  "token_values": ["", "test-token-123", "demo-token-456", "api-key-789", "session-token-abc", "auth-token-xyz"],
+  
+  "page_limits": [10, 20, 25, 50, 100, 200, 500, 1000],
+  
+  "timezones": ["UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney", "America/Chicago", "Europe/Berlin"],
+  
+  "languages": ["en", "es", "fr", "de", "pt", "ru", "zh", "ja", "ar", "it", "pl", "tr", "nl", "cs", "sv"],
+  
+  "map_types": ["osm", "bingMaps", "bingAerial", "bingHybrid", "bingRoad", "carto", "googleMaps", "googleSatellite", "googleHybrid", "googleRoad", "yandexMap", "yandexSat"],
+  
+  "distance_units": ["km", "mi", "nmi"],
+  
+  "speed_units": ["kn", "kmh", "mph"],
+  
+  "volume_units": ["ltr", "usGal", "impGal"],
+  
+  "coordinate_formats": ["dd", "ddm", "dms"],
+  
+  "alarm_types": ["general", "sos", "vibration", "movement", "lowspeed", "overspeed", "fallDown", "lowPower", "lowBattery", "fault", "powerOff", "powerOn", "door", "lock", "unlock", "geofence", "geofenceEnter", "geofenceExit", "gpsAntennaCut", "accident", "tow", "idle", "hardAcceleration", "hardBraking", "hardCornering", "laneChange", "fatigueDriving", "powerCut", "powerRestored", "jamming", "temperature", "parking", "bonnet", "footBrake", "fuelLeak", "tampering", "removing"],
+  
+  "event_types": ["deviceOnline", "deviceUnknown", "deviceOffline", "deviceInactive", "deviceMoving", "deviceStopped", "deviceOverspeed", "deviceFuelDrop", "deviceFuelIncrease", "commandResult", "geofenceEnter", "geofenceExit", "alarm", "ignitionOn", "ignitionOff", "maintenance", "textMessage", "driverChanged", "media", "maintenanceStart", "maintenanceEnd"]
+}

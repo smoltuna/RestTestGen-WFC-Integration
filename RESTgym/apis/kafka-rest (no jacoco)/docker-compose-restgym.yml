@@ -1,0 +1,101 @@
+version: '3.8'
+
+# Kafka REST Proxy - RESTgym Compatible Docker Compose
+# This orchestrates the full Kafka stack with RESTgym instrumentation
+
+services:
+  # Zookeeper - Required by Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: kafka-rest-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - kafka-rest-network
+
+  # Kafka Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-rest-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+    networks:
+      - kafka-rest-network
+
+  # Schema Registry - Required by Kafka REST Proxy
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: kafka-rest-schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - kafka-rest-network
+
+  # Kafka REST Proxy - The API being tested
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:7.5.0
+    container_name: kafka-rest-proxy
+    depends_on:
+      - kafka
+      - schema-registry
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: 'kafka:29092'
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+    networks:
+      - kafka-rest-network
+
+  # Mitmproxy - RESTgym HTTP interception
+  mitmproxy:
+    image: ubuntu:22.04
+    container_name: kafka-rest-mitmproxy
+    depends_on:
+      - rest-proxy
+    ports:
+      - "9090:9090"
+    environment:
+      API: kafka-rest
+      TOOL: ${TOOL:-manual}
+      RUN: ${RUN:-1}
+    volumes:
+      - ./infrastructure:/infrastructure
+      - ./results:/results
+    networks:
+      - kafka-rest-network
+    command: >
+      bash -c "apt-get update && 
+               apt-get -y install python3 python3-pip && 
+               pip3 install mitmproxy && 
+               mkdir -p /results/kafka-rest/\$${TOOL}/\$${RUN} && 
+               mitmdump -p 9090 --mode reverse:http://rest-proxy:8082/ -s /infrastructure/mitmproxy/store-interactions.py"
+
+networks:
+  kafka-rest-network:
+    driver: bridge
