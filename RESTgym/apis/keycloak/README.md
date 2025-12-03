@@ -6,7 +6,7 @@ Keycloak di default compila in modalità native (GraalVM), che non produce bytec
 
 ```bash
 # Clone repository
-cd /home/simone/work/temp
+cd ~/temp  # Or any temporary directory
 git clone https://github.com/keycloak/keycloak.git
 cd keycloak
 
@@ -32,19 +32,21 @@ jar xf ../lib/quarkus/generated-bytecode.jar
 ## Setup RESTgym
 
 ```bash
-cd /home/simone/work/Tesi-RESTAPI/RESTgym/apis
+# From RESTgym root directory
+cd RESTgym/apis
 mkdir -p keycloak/{classes,dictionaries,database,specifications}
 
 # Copia files
 cp -r extracted-classes/org keycloak/classes/
 cp -r lib conf bin providers themes keycloak/
-cp /home/simone/work/Tesi-RESTAPI/OAS/keycloak-openapi-23.0.7.json keycloak/specifications/
+cp ../../OAS/keycloak-openapi-23.0.7.json keycloak/specifications/
 ```
 
 ## Docker Build & Run
 
 ```bash
-cd /home/simone/work/Tesi-RESTAPI/RESTgym
+# From RESTgym root directory
+cd RESTgym
 docker build -t restgym/keycloak -f apis/keycloak/Dockerfile .
 
 # Test
