@@ -12,14 +12,15 @@ RUN mkdir /api && \
     pip3 install mitmproxy && \
     npm install -g ganache@7.9.1
 
-COPY erc20-rest-service-0.1.0.jar /api/app.jar
+COPY apis/erc20/erc20-rest-service-0.1.0.jar /api/app.jar
+COPY apis/erc20/classes/ /api/classes/
 COPY ./infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080 8545
 
 CMD mkdir -p /results/$API/$TOOL/$RUN && \
     ganache --wallet.deterministic --wallet.accounts 10 --wallet.defaultBalance 100 --chain.networkId 1337 --server.host 0.0.0.0 --server.port 8545 > /results/$API/$TOOL/$RUN/ganache.log 2>&1 & \
-    sleep 5 && \
+    sleep 20 && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
     sleep 2 && \
