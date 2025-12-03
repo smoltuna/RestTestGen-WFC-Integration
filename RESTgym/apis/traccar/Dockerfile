@@ -63,9 +63,12 @@ EXPOSE 9090 12345 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD curl -f http://localhost:8080/api/server || exit 1
 
-# Copy and setup startup script
-COPY start-restgym.sh /start-restgym.sh
-RUN chmod +x /start-restgym.sh
-
 # Container execution command (RESTgym template pattern)
-CMD ["/start-restgym.sh"]
+CMD mkdir -p /results/$API/$TOOL/$RUN && \
+    sh /infrastructure/jacoco/collect-coverage-interval.sh & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.traccar.*,output=tcpserver,port=12345,address=* \
+        -Xms512m -Xmx512m \
+        -Dfile.encoding=UTF-8 \
+        -Djava.net.preferIPv4Stack=true \
+        -jar /api/traccar.jar /api/conf/traccar.xml 2>&1 | tee /results/$API/$TOOL/$RUN/traccar.log

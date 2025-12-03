@@ -1,3 +1,6 @@
-# Results folder
+# Results
 
-This folder will contain the results of the experiment.
+Directory risultati testing: `<api>/<tool>/<run>/`
+- `.exec` - JaCoCo coverage
+- `.csv` - Coverage report
+- `interactions.db` - HTTP interactions (mitmproxy)
