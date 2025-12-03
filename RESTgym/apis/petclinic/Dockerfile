@@ -24,16 +24,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install mitmproxy
-RUN apt -y install install mitmproxy
+RUN pip3 install mitmproxy
 
 # Copy API application
 COPY apis/petclinic/spring-petclinic-rest.jar /api/spring-petclinic-rest.jar
 
 # Copy classes for JaCoCo coverage analysis
-COPY apis/petclinic/classes/ /classes/
+COPY apis/petclinic/classes/ /api/classes/
 
 # Copy database initialization files (H2 schema and data)
-COPY apis/petclinic/database/ /database/
+COPY apis/petclinic/database/ /api/database/
 
 # Copy infrastructure tools from common RESTgym infrastructure
 COPY infrastructure/ /infrastructure/

@@ -22,11 +22,14 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install mitmproxy
-RUN  apt -y install install mitmproxy
+# Install mitmproxy via pip
+RUN pip3 install mitmproxy
 
 # Copy the Spring Boot JAR file
 COPY apis/bezkoder/spring-boot-swagger-3-example-0.0.1-SNAPSHOT.jar /api/bezkoder.jar
+
+# Copy extracted class files for JaCoCo coverage analysis
+COPY apis/bezkoder/classes/ /api/classes/
 
 # Copy infrastructure from common RESTgym infrastructure
 COPY infrastructure/ /infrastructure/

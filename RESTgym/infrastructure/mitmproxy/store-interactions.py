@@ -16,7 +16,11 @@ class StoreInteractions:
         return sqlite3.connect(f"./results/{os.environ['API']}/{os.environ['TOOL']}/{os.environ['RUN']}/results.db")
     
     def init_sqlite(self):
-        self.cursor.execute('CREATE TABLE interactions (id integer PRIMARY KEY, request_method text, request_path text, request_headers text, request_content text, request_timestamp real, response_status_code integer, response_headers text, response_content text, response_timestamp real)')
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS interactions 
+            (id integer PRIMARY KEY, request_method text, request_path text, 
+             request_headers text, request_content text, request_timestamp real, 
+             response_status_code integer, response_headers text, response_content text, 
+             response_timestamp real)''')
         self.conn.commit()
     
     def response(self, flow):

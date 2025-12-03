@@ -30,28 +30,22 @@ RUN pip3 install mitmproxy
 # Create API directories
 RUN mkdir -p /api/conf /api/logs /api/data
 
-# Copy pre-built JAR and dependencies
-COPY tracker-server.jar /api/traccar.jar
-COPY target/lib /api/lib
-
-# Copy RESTgym infrastructure first (needed for config)
+# Copy RESTgym infrastructure first
 COPY ./infrastructure/ /infrastructure/
-COPY ./database/ /database/
 
-# Copy traccar configuration from database directory
-RUN cp /database/traccar.xml /api/conf/traccar.xml
+# Copy API files from apis/traccar/
+COPY ./apis/traccar/tracker-server.jar /api/traccar.jar
+COPY ./apis/traccar/database/ /database/
+COPY ./apis/traccar/schema/ /api/schema/
+COPY ./apis/traccar/dictionaries/ /api/dictionaries/
+COPY ./apis/traccar/specifications/ /api/specifications/
+COPY ./apis/traccar/restgym-api-config.yml /api/
+COPY ./apis/traccar/classes/ /api/classes/
 
-# Copy schema directory for Liquibase
-COPY ./schema/ /api/schema/
-# Copy database schema.sql where Liquibase can find it
-COPY ./database/schema.sql /api/database/schema.sql
-
-# Copy remaining RESTgym files
-COPY ./dictionaries/ /api/dictionaries/
-COPY ./specifications/ /api/specifications/
-COPY ./restgym-api-config.yml /api/
-COPY ./README.md /api/
-COPY ./classes/ /api/classes/
+# Copy traccar configuration
+RUN mkdir -p /api/database && \
+    cp /database/traccar.xml /api/conf/traccar.xml && \
+    cp /database/schema.sql /api/database/schema.sql
 
 # Set working directory
 WORKDIR /api
