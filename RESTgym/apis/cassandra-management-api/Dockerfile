@@ -24,13 +24,8 @@ RUN apt-get update && \
 COPY ./infrastructure/ /infrastructure/
 
 # Copy database initialization script
-COPY ./database/ /database/
+COPY ./apis/cassandra-management-api/database/ /database/
 
-# Expose RESTgym standard ports
-# 9090: mitmproxy reverse proxy (API access)
-# 12345: JaCoCo coverage collection
-# 8080: Management API port
-# 9042: Cassandra CQL port
 EXPOSE 9090 12345 8080 9042
 
 CMD mkdir -p /results/$API/$TOOL/$RUN && \

@@ -5,7 +5,7 @@ services:
     environment:
       - MONGO_INITDB_DATABASE=flightdatabase
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -27,10 +27,10 @@ services:
       - TOOL=manual
       - RUN=1
     ports:
-      - "9090:9090"   # mitmproxy (public API access)
-      - "12345:12345" # JaCoCo coverage port
+      - "9091:9090"   # mitmproxy (public API access)
+      - "12346:12345" # JaCoCo coverage port
     volumes:
-      - ./results:/results
+      - ../../results:/results
       - ../../infrastructure:/infrastructure:ro
     networks:
       - restgym-network
