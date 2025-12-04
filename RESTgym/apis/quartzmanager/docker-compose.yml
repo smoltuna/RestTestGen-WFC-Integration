@@ -41,7 +41,8 @@ services:
       QUARTZ_MANAGER_DB_USER: "quartzmanager"
       QUARTZ_MANAGER_DB_PASSWORD: "quartzmanager"
     volumes:
-      - ./results:/results
+      - ../../results:/results
+      - ../../infrastructure:/infrastructure:ro
     networks:
       - quartzmanager-network
 

@@ -26,7 +26,7 @@ class StoreInteractions:
     def response(self, flow):
         self.cursor.execute('INSERT INTO interactions (request_method, request_path, request_headers, request_content, request_timestamp, response_status_code, response_headers, response_content, response_timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (flow.request.method, flow.request.path, bytes(flow.request.headers).decode('utf-8'), flow.request.content.decode('utf-8'), flow.request.timestamp_start, flow.response.status_code, bytes(flow.response.headers).decode('utf-8'), flow.response.content.decode('utf-8'), flow.response.timestamp_start))
         self.count += 1
-        if self.count % 10 == 0:
+        if self.count % 5 == 0:
             self.conn.commit()
 
 addons = [StoreInteractions()]
