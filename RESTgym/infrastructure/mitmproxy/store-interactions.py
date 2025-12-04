@@ -13,7 +13,7 @@ class StoreInteractions:
         self.init_sqlite()
 
     def open_sqlite(self):
-        return sqlite3.connect(f"./results/{os.environ['API']}/{os.environ['TOOL']}/{os.environ['RUN']}/results.db")
+        return sqlite3.connect(f"/results/{os.environ['API']}/{os.environ['TOOL']}/{os.environ['RUN']}/results.db")
     
     def init_sqlite(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS interactions 
