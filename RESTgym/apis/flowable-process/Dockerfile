@@ -25,9 +25,9 @@ RUN cd /api && \
     cd /api && \
     rm -rf /tmp/war-extract
 
-COPY ./application.properties /api/application.properties
-COPY ./specifications /api/specifications
-COPY ./database /api/database
+COPY ./apis/flowable-process/application.properties /api/application.properties
+COPY ./apis/flowable-process/specifications /api/specifications
+COPY ./apis/flowable-process/database /api/database
 COPY ./infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN && \
