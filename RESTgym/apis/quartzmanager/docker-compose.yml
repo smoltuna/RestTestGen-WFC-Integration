@@ -1,54 +1,28 @@
-services:
-  quartzmanager-db:
-    container_name: quartzmanager-db
-    image: postgres:14.5
-    restart: always
-    environment:
-      POSTGRES_DB: quartzmanager
-      POSTGRES_USER: quartzmanager
-      POSTGRES_PASSWORD: quartzmanager
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U quartzmanager"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - quartzmanager-network
+version: '3.8'
 
-  quartzmanager-api:
-    container_name: quartzmanager-restgym
+services:
+  quartzmanager:
     build:
-      context: ../../..
-      dockerfile: RESTgym/apis/quartzmanager/Dockerfile
-    restart: always
-    depends_on:
-      quartzmanager-db:
-        condition: service_healthy
+      context: ../../
+      dockerfile: ./apis/quartzmanager/Dockerfile
+    container_name: quartzmanager-restgym
     ports:
-      - "9090:9090"
-      - "12345:12345"
-      - "8080:8080"
+      - "9090:9090"   # mitmproxy
+      - "12345:12345" # JaCoCo
     environment:
       API: quartzmanager
       TOOL: manual
       RUN: 1
-      QUARTZ_MANAGER_OAS_ENABLED: "true"
-      QUARTZ_MANAGER_DB_URL: "jdbc:postgresql://quartzmanager-db:5432/quartzmanager"
-      QUARTZ_MANAGER_DB_USER: "quartzmanager"
-      QUARTZ_MANAGER_DB_PASSWORD: "quartzmanager"
     volumes:
       - ../../results:/results
       - ../../infrastructure:/infrastructure:ro
-    networks:
-      - quartzmanager-network
-
-volumes:
-  postgres_data:
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/quartz-manager/scheduler || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
 
 networks:
-  quartzmanager-network:
-    driver: bridge
+  default:
+    name: quartzmanager-network

@@ -1,2 +1,2 @@
--- Quartz Manager Sample Data
--- No initial data required - Quartz Manager will create jobs and triggers via API
+-- Quartz Manager uses H2 in-memory database by default
+-- No initial data needed (empty file for RESTgym compliance)
