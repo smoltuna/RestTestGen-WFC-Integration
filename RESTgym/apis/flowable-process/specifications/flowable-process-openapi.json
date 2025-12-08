@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "/flowable-rest/idm-api"
+      "url": "http://localhost:8080/flowable-rest/idm-api"
     }
   ],
   "tags": [

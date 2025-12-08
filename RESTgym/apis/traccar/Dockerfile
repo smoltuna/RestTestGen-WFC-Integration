@@ -3,6 +3,8 @@ FROM ubuntu:22.04
 
 # Environment variables
 ENV API=traccar
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create RESTgym directories
@@ -35,13 +37,13 @@ COPY ./infrastructure/ /infrastructure/
 
 # Copy API files from apis/traccar/
 COPY ./apis/traccar/tracker-server.jar /api/traccar.jar
-COPY ./apis/traccar/lib/ /api/lib/
-COPY ./apis/traccar/database/ /database/
-COPY ./apis/traccar/schema/ /api/schema/
-COPY ./apis/traccar/dictionaries/ /api/dictionaries/
-COPY ./apis/traccar/specifications/ /api/specifications/
+COPY ./apis/traccar/lib /api/lib
+COPY ./apis/traccar/database /database
+COPY ./apis/traccar/schema /api/schema
+COPY ./apis/traccar/dictionaries /api/dictionaries
+COPY ./apis/traccar/specifications /api/specifications
 COPY ./apis/traccar/restgym-api-config.yml /api/
-COPY ./apis/traccar/classes/ /api/classes/
+COPY ./apis/traccar/classes /api/classes
 
 # Copy traccar configuration
 RUN mkdir -p /api/database && \

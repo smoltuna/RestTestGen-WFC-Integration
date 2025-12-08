@@ -3,6 +3,8 @@ FROM ubuntu:22.04
 
 # Environment configuration
 ENV API=petclinic
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create RESTgym directories

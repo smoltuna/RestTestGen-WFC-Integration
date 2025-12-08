@@ -8,8 +8,11 @@ RUN mkdir /api && \
 
 RUN apt update && \
     apt -y upgrade && \
-    apt -y install openjdk-8-jdk mitmproxy && \
-    apt -y autoremove
+    apt -y install openjdk-11-jdk python3 python3-pip && \
+    pip3 install mitmproxy && \
+    apt -y autoremove && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY apis/notebookmanager/notebookmanager.jar /api/notebookmanager.jar
 COPY apis/notebookmanager/classes/ /api/classes/

@@ -1,6 +1,8 @@
 FROM ubuntu:22.04
 
 ENV API=quartzmanager
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p /api /infrastructure /results

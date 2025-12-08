@@ -6,6 +6,8 @@ FROM ubuntu:22.04
 
 # Environment variables
 ENV API=nexus
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NEXUS_HOME=/opt/sonatype/nexus
 ENV NEXUS_DATA=/nexus-data

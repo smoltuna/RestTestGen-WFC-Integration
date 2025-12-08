@@ -1,6 +1,8 @@
 FROM ubuntu:22.04
 
 ENV API=realworld-backend-micronaut
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 
 RUN mkdir /api && \
     mkdir /infrastructure && \

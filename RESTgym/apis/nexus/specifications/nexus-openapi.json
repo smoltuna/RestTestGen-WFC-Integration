@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "/service/rest/"
+      "url": "http://localhost:8081/service/rest/"
     }
   ],
   "tags": [

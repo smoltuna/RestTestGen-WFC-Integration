@@ -5,6 +5,8 @@ USER root
 
 # Environment configuration
 ENV API=cassandra-management-api
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV USE_MGMT_API=true
 ENV MGMT_API_LISTEN_TCP_PORT=8080
 ENV DEBIAN_FRONTEND=noninteractive

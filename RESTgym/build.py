@@ -41,7 +41,13 @@ def build_all():
     images = common.get_apis() + common.get_tools()
 
     # Uncomment next line to limit the build to some images
-    #images = ['resttestgen']
+
+    images = [
+        'keycloak', 'traccar', 'flowable-process', 'nexus', 'petclinic', 
+        'gravitee', 'quartzmanager', 'erc20', 'kafka-rest', 
+        'spring-kafka-publisher', 'cassandra-management-api', 
+        'bezkoder', 'flightsearchapi', 'realworld-backend-micronaut'
+    ]
 
     threads = math.floor(multiprocessing.cpu_count() * 0.9)
 

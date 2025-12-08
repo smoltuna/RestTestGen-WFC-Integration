@@ -7,6 +7,8 @@ FROM ubuntu:22.04
 
 # Environment variables
 ENV API=kafka-rest
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV KAFKA_REST_HOST_NAME=localhost
 ENV KAFKA_REST_LISTENERS=http://0.0.0.0:8082

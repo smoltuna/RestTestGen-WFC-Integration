@@ -1,6 +1,8 @@
 FROM ubuntu:22.04
 
 ENV API=spring-kafka-producer
+ENV TOOL=${TOOL:-manual}
+ENV RUN=${RUN:-1}
 
 RUN mkdir /api && \
     mkdir /infrastructure && \
