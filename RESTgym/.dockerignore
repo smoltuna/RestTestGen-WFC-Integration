@@ -1,0 +1,31 @@
+# Build artifacts
+**/build/
+**/target/
+**/.gradle/
+**/gradle/plugins/*/build/
+**/node_modules/
+
+# Git
+**/.git/
+**/.gitignore
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# Results
+results/
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+
+# Docker
+**/.dockerignore
+**/Dockerfile
+
+# OS
+**/.DS_Store
+**/Thumbs.db
