@@ -18,6 +18,10 @@ RUN mkdir -p /api/classes && \
     cd /api/classes && \
     jar xf /api/flightsearchapi.jar && \
     find . -name "*.jar" -type f -delete
+
+# Copy OpenAPI specifications for test generation
+COPY apis/flightsearchapi/specifications/ /api/specifications/
+
 COPY ./infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \

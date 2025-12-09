@@ -33,6 +33,12 @@ COPY apis/bezkoder/spring-boot-swagger-3-example-0.0.1-SNAPSHOT.jar /api/bezkode
 # Copy extracted class files for JaCoCo coverage analysis
 COPY apis/bezkoder/classes/ /api/classes/
 
+# Copy auth.py for automatic authentication
+COPY apis/bezkoder/auth.py /api/auth.py
+
+# Copy OpenAPI specifications for test generation
+COPY apis/bezkoder/specifications/ /api/specifications/
+
 # Copy infrastructure from common RESTgym infrastructure
 COPY infrastructure/ /infrastructure/
 
@@ -50,7 +56,7 @@ EXPOSE 9090 12345 8080
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* \
         -Dfile.encoding=UTF-8 \
         -Dserver.port=8080 \

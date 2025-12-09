@@ -16,6 +16,10 @@ RUN mkdir /api && \
 
 COPY apis/erc20/erc20-rest-service-0.1.0.jar /api/app.jar
 COPY apis/erc20/classes/ /api/classes/
+
+# Copy OpenAPI specifications for test generation
+COPY apis/erc20/specifications/ /api/specifications/
+
 COPY ./infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080 8545

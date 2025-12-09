@@ -29,6 +29,9 @@ COPY apis/quartzmanager/classes/ /api/classes/
 
 COPY apis/quartzmanager/database/ /api/database/
 
+# Copy OpenAPI specifications for test generation
+COPY apis/quartzmanager/specifications/ /api/specifications/
+
 COPY infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080
@@ -36,7 +39,7 @@ EXPOSE 9090 12345 8080
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=it.fabioformosa.*,output=tcpserver,port=12345,address=* \
         -Dfile.encoding=UTF-8 \
         -Dserver.port=8080 \

@@ -279,12 +279,15 @@ if __name__ == "__main__":
     
     remaining_runs = compute_remaining_runs(desired_runs)
     
-    # Uncomment next line to launch a manual subset of runs
-    # Build only second half (last 7 APIs)
+    # Test 11 API buildate con resttestgen
     remaining_runs = [
-        {'api': 'kafka-rest', 'tool': 'resttestgen'},
-        {'api': 'spring-kafka-publisher', 'tool': 'resttestgen'},
-        {'api': 'cassandra-management-api', 'tool': 'resttestgen'},
+        {'api': 'traccar', 'tool': 'resttestgen'},
+        {'api': 'flowable-process', 'tool': 'resttestgen'},
+        {'api': 'nexus', 'tool': 'resttestgen'},
+        {'api': 'petclinic', 'tool': 'resttestgen'},
+        {'api': 'gravitee', 'tool': 'resttestgen'},
+        {'api': 'quartzmanager', 'tool': 'resttestgen'},
+        {'api': 'erc20', 'tool': 'resttestgen'},
         {'api': 'bezkoder', 'tool': 'resttestgen'},
         {'api': 'flightsearchapi', 'tool': 'resttestgen'},
         {'api': 'realworld-backend-micronaut', 'tool': 'resttestgen'},

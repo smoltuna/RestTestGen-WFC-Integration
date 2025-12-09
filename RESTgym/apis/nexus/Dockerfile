@@ -35,6 +35,9 @@ RUN apt-get update && \
 # Install mitmproxy
 RUN pip3 install mitmproxy
 
+# Copy OpenAPI specifications for test generation
+COPY apis/nexus/specifications/ /api/specifications/
+
 # Copy RESTgym infrastructure
 COPY ./infrastructure/ /infrastructure/
 
@@ -64,6 +67,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8081/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8081/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     export INSTALL4J_ADD_VM_PARAMS="-javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=org.sonatype.*:com.sonatype.*,output=tcpserver,port=12345,address=* -Xms${JAVA_MIN_MEM} -Xmx${JAVA_MAX_MEM}" && \
     /opt/sonatype/nexus/bin/nexus run 2>&1 | tee /results/$API/$TOOL/$RUN/nexus.log

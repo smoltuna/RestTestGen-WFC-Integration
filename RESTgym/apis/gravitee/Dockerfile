@@ -41,6 +41,9 @@ COPY apis/gravitee/classes/ /api/classes/
 
 COPY apis/gravitee/database/ /api/database/
 
+# Copy OpenAPI specifications for test generation
+COPY apis/gravitee/specifications/ /api/specifications/
+
 COPY infrastructure/ /infrastructure/
 
 # Upgrade JaCoCo to 0.8.12 for Java 21 support (Gravitee requires Java 21)
@@ -66,7 +69,7 @@ ENV gravitee_http_port=8083
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8083/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8083/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     cd /opt/graviteeio/graviteeio-apim-rest-api-4.9.7 && \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=io.gravitee.*,output=tcpserver,port=12345,address=* \
         -Dfile.encoding=UTF-8 \

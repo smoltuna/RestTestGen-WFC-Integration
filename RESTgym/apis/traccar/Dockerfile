@@ -43,6 +43,7 @@ COPY ./apis/traccar/schema /api/schema
 COPY ./apis/traccar/dictionaries /api/dictionaries
 COPY ./apis/traccar/specifications /api/specifications
 COPY ./apis/traccar/restgym-api-config.yml /api/
+COPY ./apis/traccar/auth.py /api/
 COPY ./apis/traccar/classes /api/classes
 
 # Copy traccar configuration
@@ -64,7 +65,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.traccar.*,output=tcpserver,port=12345,address=* \
         -cp "/api/traccar.jar:/api/lib/*" \
         -Xms512m -Xmx512m \
