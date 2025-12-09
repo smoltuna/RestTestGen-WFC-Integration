@@ -6,8 +6,8 @@ import base64
 
 class FlowableAuth:
     def __init__(self):
-        self.username = "admin"
-        self.password = "test"
+        self.username = "restapitestteam@gmail.com"
+        self.password = "universe"
         self.auth_header = None
     
     def get_auth_header(self):

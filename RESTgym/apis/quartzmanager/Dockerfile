@@ -34,6 +34,7 @@ COPY infrastructure/ /infrastructure/
 EXPOSE 9090 12345 8080
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=it.fabioformosa.*,output=tcpserver,port=12345,address=* \
@@ -44,8 +45,8 @@ CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
         -Dquartz-manager.oas.enabled=true \
         -Dquartz-manager.security.jwt.secret=mySecretKey123456789012345678901234567890 \
         -Dquartz-manager.security.accounts.in-memory.enabled=true \
-        -Dquartz-manager.security.accounts.in-memory.users[0].username=admin \
-        -Dquartz-manager.security.accounts.in-memory.users[0].password=admin \
+        -Dquartz-manager.security.accounts.in-memory.users[0].username=restapitestteam@gmail.com \
+        -Dquartz-manager.security.accounts.in-memory.users[0].password=universe \
         -Dquartz-manager.security.accounts.in-memory.users[0].roles[0]=ADMIN \
         -Dspring.h2.console.enabled=false \
         -jar /api/quartz-manager.war

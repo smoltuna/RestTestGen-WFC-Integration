@@ -20,7 +20,8 @@ RUN mkdir -p /api/classes && \
     find . -name "*.jar" -type f -delete
 COPY ./infrastructure/ /infrastructure/
 
-CMD mkdir -p /results/$API/$TOOL/$RUN && \
+CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* \

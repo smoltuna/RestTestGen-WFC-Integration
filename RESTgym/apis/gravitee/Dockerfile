@@ -63,7 +63,8 @@ ENV gravitee_ratelimit_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelect
 ENV gravitee_http_port=8083
 
 # Start Gravitee with JaCoCo, mitmproxy, and coverage collection
-CMD mkdir -p /results/$API/$TOOL/$RUN && \
+CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8083/ -s /infrastructure/mitmproxy/store-interactions.py & \
     cd /opt/graviteeio/graviteeio-apim-rest-api-4.9.7 && \

@@ -32,7 +32,8 @@ COPY ./apis/flowable-process/specifications /api/specifications
 COPY ./apis/flowable-process/database /api/database
 COPY ./infrastructure/ /infrastructure/
 
-CMD mkdir -p /results/$API/$TOOL/$RUN && \
+CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8080 -s /infrastructure/mitmproxy/store-interactions.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.flowable.*,output=tcpserver,port=12345,address=* -Dfile.encoding=UTF-8 -Dspring.config.location=file:/api/application.properties -jar /api/flowable-rest.war

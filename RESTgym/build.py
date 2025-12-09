@@ -43,10 +43,10 @@ def build_all():
     # Uncomment next line to limit the build to some images
 
     images = [
-        'keycloak', 'traccar', 'flowable-process', 'nexus', 'petclinic', 
-        'gravitee', 'quartzmanager', 'erc20', 'kafka-rest', 
-        'spring-kafka-publisher', 'cassandra-management-api', 
-        'bezkoder', 'flightsearchapi', 'realworld-backend-micronaut'
+        'traccar', 'petclinic', 'bezkoder', 'erc20', 'flightsearchapi', 
+        'realworld-backend-micronaut', 'flowable-process', 'nexus', 'gravitee', 
+        'quartzmanager', 'kafka-rest', 'spring-kafka-publisher', 
+        'cassandra-management-api'
     ]
 
     threads = math.floor(multiprocessing.cpu_count() * 0.9)

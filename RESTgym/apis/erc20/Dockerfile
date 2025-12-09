@@ -20,7 +20,8 @@ COPY ./infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080 8545
 
-CMD mkdir -p /results/$API/$TOOL/$RUN && \
+CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     ganache --wallet.deterministic --wallet.accounts 10 --wallet.defaultBalance 100 --chain.networkId 1337 --server.host 0.0.0.0 --server.port 8545 > /results/$API/$TOOL/$RUN/ganache.log 2>&1 & \
     sleep 20 && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \

@@ -8,8 +8,8 @@ class QuartzAuth:
     def __init__(self):
         # Quartz Manager può essere configurato senza auth
         # Usa credenziali base se configurate
-        self.username = "admin"
-        self.password = "admin"
+        self.username = "restapitestteam@gmail.com"
+        self.password = "universe"
         self.auth_header = None
         self.enabled = False  # Set to True if auth is configured
     

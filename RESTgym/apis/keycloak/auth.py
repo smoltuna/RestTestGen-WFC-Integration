@@ -7,8 +7,8 @@ import json
 
 class KeycloakAuth:
     def __init__(self):
-        self.username = "admin"
-        self.password = "admin"
+        self.username = "restapitestteam@gmail.com"
+        self.password = "universe"
         self.token = None
         self.token_url = "http://localhost:8080/realms/master/protocol/openid-connect/token"
     

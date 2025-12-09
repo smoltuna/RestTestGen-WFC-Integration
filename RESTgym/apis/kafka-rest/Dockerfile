@@ -73,6 +73,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
 # Note: This requires external Kafka and Schema Registry
 # Use docker-compose for full stack, or set KAFKA_REST_BOOTSTRAP_SERVERS externally
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8082/ -s /infrastructure/mitmproxy/store-interactions.py & \
     export KAFKAREST_OPTS="-javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=io.confluent.*,output=tcpserver,port=12345,address=*" && \

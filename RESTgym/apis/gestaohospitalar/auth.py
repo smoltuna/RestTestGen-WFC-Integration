@@ -16,11 +16,11 @@ class GestaoHospitalarAuth:
                 # Register
                 signup_url = f"{self.base_url}/register"
                 signup_payload = {
-                    "email": "restgym.test@gmail.com",
-                    "password": "RESTgym2024!",
+                    "email": "restapitestteam@gmail.com",
+                    "password": "universe",
                     "phone": "+39 3406089282",
                     "address": "Test Address",
-                    "name": "RESTgym Test"
+                    "name": "REST API Test Team"
                 }
                 headers = {
                     "Content-Type": "application/json",

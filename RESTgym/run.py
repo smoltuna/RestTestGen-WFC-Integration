@@ -163,9 +163,10 @@ def launch_run(api, tool, run_count, total_runs):
                     f.write(f"Could not start API ({api}) container.\n{e}\n\n")
                 error_occurred = True
         
-        # Wait 45 seconds for the API to start
+        # Wait for the API to start (longer for heavy apps like Keycloak)
         if not error_occurred:
-            time.sleep(45)
+            startup_wait = 45
+            time.sleep(startup_wait)
         else:
             time.sleep(2)
         
@@ -191,9 +192,9 @@ def launch_run(api, tool, run_count, total_runs):
                 error_occurred = True
 
 
-        # Perform a health check of containers each minute, for 60 times
+        # Perform a health check of containers each minute, for 5 times (quick test)
         if not error_occurred:
-            for minute in range(1, 61):
+            for minute in range(1, 6):
                 time.sleep(60)
                 try:
                     api_container.reload()
@@ -279,7 +280,9 @@ if __name__ == "__main__":
     remaining_runs = compute_remaining_runs(desired_runs)
     
     # Uncomment next line to launch a manual subset of runs
-    #remaining_runs = [{'api': 'market', 'tool': 'restler'}]
+    remaining_runs = [
+        {'api': 'keycloak', 'tool': 'resttestgen'}
+    ]
     
     missing_images = check_docker_images(remaining_runs)
     if len(missing_images) > 0:
@@ -316,6 +319,6 @@ if __name__ == "__main__":
             )
         run_thread.start()
 
-        # If not last run, wait 60 seconds before launching next
+        # If not last run, wait 10 seconds before launching next
         if len(remaining_runs) > 0:
-            time.sleep(60)
+            time.sleep(10)

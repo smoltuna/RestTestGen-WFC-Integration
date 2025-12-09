@@ -16,9 +16,9 @@ class BezKoderAuth:
                 # Signup
                 signup_url = f"{self.base_url}/api/auth/signup"
                 signup_payload = {
-                    "username": "restgym_test",
-                    "email": "restgym.test@gmail.com",
-                    "password": "RESTgym2024!",
+                    "username": "restapitestteam",
+                    "email": "restapitestteam@gmail.com",
+                    "password": "universe",
                     "role": ["user"]
                 }
                 headers = {
@@ -32,8 +32,8 @@ class BezKoderAuth:
                 # Login
                 login_url = f"{self.base_url}/api/auth/signin"
                 login_payload = {
-                    "username": "restgym_test",
-                    "password": "RESTgym2024!"
+                    "username": "restapitestteam",
+                    "password": "universe"
                 }
                 login_response = requests.post(login_url, json=login_payload, headers=headers, timeout=5)
                 

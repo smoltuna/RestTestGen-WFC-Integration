@@ -62,6 +62,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
 
 # Container execution command (RESTgym template pattern)
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8081/ -s /infrastructure/mitmproxy/store-interactions.py & \
     export INSTALL4J_ADD_VM_PARAMS="-javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=org.sonatype.*:com.sonatype.*,output=tcpserver,port=12345,address=* -Xms${JAVA_MIN_MEM} -Xmx${JAVA_MAX_MEM}" && \

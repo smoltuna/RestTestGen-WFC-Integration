@@ -16,9 +16,9 @@ class RealWorldAuth:
             signup_url = f"{self.base_url}/api/users"
             signup_payload = {
                 "user": {
-                    "username": "restgym_test",
-                    "email": "restgym.test@gmail.com",
-                    "password": "RESTgym2024!"
+                    "username": "restapitestteam",
+                    "email": "restapitestteam@gmail.com",
+                    "password": "universe"
                 }
             }
             headers = {
@@ -34,8 +34,8 @@ class RealWorldAuth:
                 login_url = f"{self.base_url}/api/users/login"
                 login_payload = {
                     "user": {
-                        "email": "restgym.test@gmail.com",
-                        "password": "RESTgym2024!"
+                        "email": "restapitestteam@gmail.com",
+                        "password": "universe"
                     }
                 }
                 login_response = requests.post(login_url, json=login_payload, headers=headers, timeout=5)

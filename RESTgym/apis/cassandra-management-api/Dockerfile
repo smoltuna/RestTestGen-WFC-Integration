@@ -30,7 +30,8 @@ COPY ./apis/cassandra-management-api/database/ /database/
 
 EXPOSE 9090 12345 8080 9042
 
-CMD mkdir -p /results/$API/$TOOL/$RUN && \
+CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
+    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     cassandra -R > /results/$API/$TOOL/$RUN/cassandra.log 2>&1 & \
     sleep 30 && \
     until cqlsh -e "SELECT release_version FROM system.local" > /dev/null 2>&1; do sleep 5; done && \
