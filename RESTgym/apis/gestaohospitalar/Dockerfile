@@ -15,7 +15,7 @@ RUN apt update && \
 
 COPY apis/gestaohospitalar/gestaohospitalar-0.0.1.jar /api/gestaohospitalar.jar
 COPY apis/gestaohospitalar/classes/ /api/classes/
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \

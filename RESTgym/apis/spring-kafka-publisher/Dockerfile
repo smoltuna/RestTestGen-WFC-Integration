@@ -13,7 +13,7 @@ RUN mkdir /api && \
     apt -y autoremove
 
 COPY ./apis/spring-kafka-publisher/ /api/
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \

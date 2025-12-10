@@ -17,8 +17,8 @@ COPY ./apis/keycloak/ /api/
 # Copy OpenAPI specifications for test generation
 COPY apis/keycloak/specifications/ /api/specifications/
 
-COPY ./infrastructure/ /infrastructure/
-COPY ./apis/keycloak/auth.py /api/
+COPY apis/infrastructure/ /infrastructure/
+COPY apis/keycloak/auth.py /api/
 
 ENV JAVA_OPTS="-Xms256m -Xmx2048m"
 ENV KC_HOME_DIR=/api

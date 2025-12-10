@@ -13,7 +13,7 @@ RUN mkdir /api && \
     apt -y autoremove
 
 COPY ./apis/spring-kafka-producer/ /api/
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \

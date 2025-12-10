@@ -37,7 +37,7 @@ RUN apt-get update && \
 RUN pip3 install mitmproxy
 
 # Copy RESTgym infrastructure
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Copy Kafka REST binaries and scripts from official image
 COPY --from=kafka-rest-base /usr/share/java/kafka-rest-lib /usr/share/java/kafka-rest-lib

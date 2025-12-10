@@ -17,7 +17,7 @@ COPY ./apis/realworld-backend-micronaut/ /api/
 # Copy OpenAPI specifications for test generation
 COPY apis/realworld-backend-micronaut/specifications/ /api/specifications/
 
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \

@@ -23,7 +23,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy infrastructure tools (JaCoCo, mitmproxy)
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Copy database initialization script
 COPY ./apis/cassandra-management-api/database/ /database/

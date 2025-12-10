@@ -40,7 +40,7 @@ COPY apis/bezkoder/auth.py /api/auth.py
 COPY apis/bezkoder/specifications/ /api/specifications/
 
 # Copy infrastructure from common RESTgym infrastructure
-COPY infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Expose RESTgym standard ports
 # 9090: mitmproxy (external access)

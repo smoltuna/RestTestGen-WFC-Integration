@@ -39,7 +39,7 @@ RUN pip3 install mitmproxy
 COPY apis/nexus/specifications/ /api/specifications/
 
 # Copy RESTgym infrastructure
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Copy Nexus from official image
 COPY --from=nexus-base /opt/sonatype/nexus /opt/sonatype/nexus

@@ -44,7 +44,7 @@ COPY apis/gravitee/database/ /api/database/
 # Copy OpenAPI specifications for test generation
 COPY apis/gravitee/specifications/ /api/specifications/
 
-COPY infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Upgrade JaCoCo to 0.8.12 for Java 21 support (Gravitee requires Java 21)
 RUN wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar -O /infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar && \

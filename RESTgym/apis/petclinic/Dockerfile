@@ -41,7 +41,7 @@ COPY apis/petclinic/database/ /api/database/
 COPY apis/petclinic/specifications/ /api/specifications/
 
 # Copy infrastructure tools from common RESTgym infrastructure
-COPY infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 # Expose RESTgym standard ports
 # 9090: mitmproxy reverse proxy (API access)

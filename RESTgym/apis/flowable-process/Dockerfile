@@ -30,7 +30,7 @@ RUN cd /api && \
 COPY ./apis/flowable-process/application.properties /api/application.properties
 COPY ./apis/flowable-process/specifications /api/specifications
 COPY ./apis/flowable-process/database /api/database
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \

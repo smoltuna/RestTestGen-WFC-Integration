@@ -32,7 +32,7 @@ COPY apis/quartzmanager/database/ /api/database/
 # Copy OpenAPI specifications for test generation
 COPY apis/quartzmanager/specifications/ /api/specifications/
 
-COPY infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080
 

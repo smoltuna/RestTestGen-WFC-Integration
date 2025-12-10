@@ -22,7 +22,7 @@ RUN mkdir -p /api/classes && \
 # Copy OpenAPI specifications for test generation
 COPY apis/flightsearchapi/specifications/ /api/specifications/
 
-COPY ./infrastructure/ /infrastructure/
+COPY apis/infrastructure/ /infrastructure/
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
