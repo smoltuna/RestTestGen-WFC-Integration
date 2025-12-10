@@ -1,0 +1,40 @@
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Build artifacts (exclude - we keep target/lib)
+# target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# RESTgym local testing artifacts (not needed in container)
+test-*.ps1
+TEST_*.md
+coverage-report/
+*.exec
+test-interactions.db
+data/
+web/

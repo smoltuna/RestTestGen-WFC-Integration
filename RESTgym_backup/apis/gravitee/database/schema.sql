@@ -1,0 +1,42 @@
+-- Gravitee.io APIM MongoDB Initialization Schema
+-- This schema is simplified for testing purposes
+-- Gravitee uses MongoDB collections, not SQL tables
+
+-- Note: MongoDB initialization will be handled by the application itself
+-- This file documents the expected collections for reference
+
+-- Collections used by Gravitee APIM:
+-- - apis: API definitions
+-- - applications: Application registrations
+-- - plans: API plans (rate limits, security)
+-- - subscriptions: API subscriptions
+-- - users: User accounts
+-- - groups: User groups
+-- - roles: Role definitions
+-- - memberships: API/Application memberships
+-- - pages: API documentation pages
+-- - events: API lifecycle events
+-- - categories: API categories
+-- - dictionaries: Custom dictionaries
+-- - environments: Environment configurations
+-- - organizations: Organization settings
+-- - parameters: System parameters
+-- - metadata: Custom metadata
+-- - ratelimit: Rate limit counters
+-- - commands: Gateway commands
+-- - audits: Audit log entries
+-- - generic_notification_configs: Notification configurations
+-- - portal_notifications: Portal notifications
+-- - alerts: Alert definitions
+-- - triggers: Alert triggers
+-- - dashboards: Custom dashboards
+-- - quality_rules: API quality rules
+-- - scoring: API scoring reports
+-- - integrations: Third-party integrations
+-- - identities: Identity provider configurations
+-- - access_points: API access points
+-- - shared_policy_groups: Shared policy groups
+-- - licenses: License information
+
+-- Indexes will be created automatically by Gravitee on first startup
+-- No manual schema creation needed for MongoDB

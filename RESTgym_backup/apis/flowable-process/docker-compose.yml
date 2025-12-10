@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  flowable:
+    build:
+      context: ../../
+      dockerfile: ./apis/flowable-process/Dockerfile
+    container_name: flowable-process-restgym
+    ports:
+      - "9090:9090"   # mitmproxy
+      - "12345:12345" # JaCoCo
+    environment:
+      API: flowable-process
+      TOOL: manual
+      RUN: 1
+    volumes:
+      - ../../results:/results
+      - ../../infrastructure:/infrastructure:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/flowable-rest/service/management/engine || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+networks:
+  default:
+    name: flowable-network

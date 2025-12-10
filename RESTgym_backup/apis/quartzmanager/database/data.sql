@@ -1,0 +1,2 @@
+-- Quartz Manager uses H2 in-memory database by default
+-- No initial data needed (empty file for RESTgym compliance)

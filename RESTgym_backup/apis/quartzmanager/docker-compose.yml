@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  quartzmanager:
+    build:
+      context: ../../
+      dockerfile: ./apis/quartzmanager/Dockerfile
+    container_name: quartzmanager-restgym
+    ports:
+      - "9090:9090"   # mitmproxy
+      - "12345:12345" # JaCoCo
+    environment:
+      API: quartzmanager
+      TOOL: manual
+      RUN: 1
+    volumes:
+      - ../../results:/results
+      - ../../infrastructure:/infrastructure:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/quartz-manager/scheduler || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+networks:
+  default:
+    name: quartzmanager-network
