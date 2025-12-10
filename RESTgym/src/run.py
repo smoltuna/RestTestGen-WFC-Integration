@@ -300,19 +300,12 @@ if __name__ == "__main__":
     read_config()
     print("This is the run module. It will run up to 20 repetitions of the experiment for each tool and API.")
     print(f"Time budget: {TIME_BUDGET_MINS} minutes. Minimum CPUs: {MINIMUM_CPUS}. Minimum RAM: {MINIMUM_RAM_GB} GB.")
-    try:
-        desired_runs = int(input("How many runs? [1-20]: "))
-    except:
-        print("Please specify an whole number.")
-        sys.exit(1)
-    if desired_runs < 1 or desired_runs > 20:
-        print("Please specify a number in the range 1-20.")
-        sys.exit(1)
+    desired_runs = 1  # Hardcoded for automated testing
 
     remaining_runs = compute_remaining_runs(desired_runs)
 
     # Uncomment next line to launch a manual subset of runs
-    # remaining_runs = [{'api': 'market', 'tool': 'restler'}]
+    remaining_runs = [{'api': 'erc20', 'tool': 'resttestgen'}]
 
     missing_images = check_docker_images(remaining_runs)
     if len(missing_images) > 0:
@@ -326,7 +319,8 @@ if __name__ == "__main__":
     total_runs = len(remaining_runs)
     run_count = 0
 
-    input("Press ENTER to start the execution of the experiment (or CTRL+C to cancel)...")
+    # input("Press ENTER to start the execution of the experiment (or CTRL+C to cancel)...")  # Commented for automated run
+    print(f"Starting execution of {total_runs} run(s)...")
 
     with Progress() as progress:
         experiment_task = progress.add_task("Running experiment...", total=total_runs*(TIME_BUDGET_MINS+1))
