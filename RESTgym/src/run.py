@@ -305,7 +305,7 @@ if __name__ == "__main__":
     remaining_runs = compute_remaining_runs(desired_runs)
 
     # Uncomment next line to launch a manual subset of runs
-    remaining_runs = [{'api': 'traccar', 'tool': 'resttestgen'}, {'api': 'notebookmanager', 'tool': 'resttestgen'}]
+    # remaining_runs = [{'api': 'traccar', 'tool': 'resttestgen'}, {'api': 'notebookmanager', 'tool': 'resttestgen'}]
 
     missing_images = check_docker_images(remaining_runs)
     if len(missing_images) > 0:

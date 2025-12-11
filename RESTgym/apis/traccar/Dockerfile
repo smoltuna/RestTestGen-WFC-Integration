@@ -40,7 +40,6 @@ COPY apis/traccar/tracker-server.jar /api/traccar.jar
 COPY apis/traccar/lib /api/lib
 COPY apis/traccar/database /database
 COPY apis/traccar/schema /api/schema
-COPY apis/traccar/dictionaries /api/dictionaries
 COPY apis/traccar/specifications /api/specifications
 COPY apis/traccar/restgym-api-config.yml /api/
 COPY apis/traccar/auth.py /api/
