@@ -48,7 +48,8 @@ COPY apis/traccar/classes /api/classes
 # Copy traccar configuration
 RUN mkdir -p /api/database && \
     cp /database/traccar.xml /api/conf/traccar.xml && \
-    cp /database/schema.sql /api/database/schema.sql
+    cp /database/schema.sql /api/database/schema.sql && \
+    cp /database/data.sql /api/database/data.sql
 
 # Set working directory
 WORKDIR /api

@@ -3,6 +3,7 @@ Traccar GPS Tracking System - Authentication Script
 Basic Auth with pre-configured admin user
 """
 import base64
+from mitmproxy import ctx
 
 class TraccarAuth:
     def __init__(self):
@@ -19,6 +20,8 @@ class TraccarAuth:
     
     def request(self, flow):
         # Add Basic Auth header to all requests
-        flow.request.headers["Authorization"] = self.get_auth_header()
+        auth = self.get_auth_header()
+        ctx.log.info(f"[AUTH] Adding Authorization header to {flow.request.pretty_url}")
+        flow.request.headers["Authorization"] = auth
 
 addons = [TraccarAuth()]

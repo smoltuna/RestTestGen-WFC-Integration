@@ -5,8 +5,13 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
     
-    <!-- Initialize database schema from SQL file (absolute path from working directory /api) -->
+    <!-- Initialize database schema from SQL file -->
     <changeSet id="1" author="restgym">
         <sqlFile path="database/schema.sql" relativeToChangelogFile="false"/>
+    </changeSet>
+    
+    <!-- Load initial data -->
+    <changeSet id="2" author="restgym">
+        <sqlFile path="database/data.sql" relativeToChangelogFile="false"/>
     </changeSet>
 </databaseChangeLog>

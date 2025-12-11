@@ -1,17 +1,22 @@
 -- Traccar Sample Data for RESTgym Testing
 
--- Insert Server configuration
-INSERT INTO tc_servers (id, registration, readonly, latitude, longitude, zoom, twelveHourFormat, version) 
-VALUES (1, TRUE, FALSE, 0, 0, 0, FALSE, '6.10.0');
+-- Update Server configuration (Traccar creates server with id=1 by default)
+UPDATE tc_servers SET registration = TRUE, readonly = FALSE, latitude = 0, longitude = 0, zoom = 0, twelveHourFormat = FALSE WHERE id = 1;
 
 -- Insert test users
--- Password: 'admin' hashed with SHA-256 (simplified for testing)
-INSERT INTO tc_users (id, name, email, administrator, readonly, disabled, deviceLimit, userLimit) VALUES
-(1, 'Admin User', 'admin@traccar.org', TRUE, FALSE, FALSE, -1, 0),
-(2, 'Test User', 'test@example.com', FALSE, FALSE, FALSE, 10, 0),
-(3, 'Demo User', 'demo@demo.com', FALSE, FALSE, FALSE, 5, 0),
-(4, 'Manager', 'manager@company.com', FALSE, FALSE, FALSE, 50, 5),
-(5, 'Readonly User', 'readonly@example.com', FALSE, TRUE, FALSE, 0, 0);
+-- Password: 'universe' for restapitestteam@gmail.com 
+-- Traccar uses PBKDF2-HMAC-SHA1 with 1000 iterations, 24-byte salt, 24-byte hash
+-- Salt: 'd2ec2980885a4e5a02f46177d84f4d84'
+-- Hash: PBKDF2(password, salt) = 4c29eece128f4efc7af84e019fe117c70c54709e68657441
+INSERT INTO tc_users (id, name, email, login, hashedPassword, salt, administrator, readonly, disabled, deviceLimit, userLimit) VALUES
+(1, 'REST API Test User', 'restapitestteam@gmail.com', 'restapitestteam@gmail.com', 
+ '4c29eece128f4efc7af84e019fe117c70c54709e68657441', 
+ 'd2ec2980885a4e5a02f46177d84f4d84', TRUE, FALSE, FALSE, -1, 0),
+(2, 'Admin User', 'admin@traccar.org', 'admin@traccar.org', NULL, NULL, TRUE, FALSE, FALSE, -1, 0),
+(3, 'Test User', 'test@example.com', 'test@example.com', NULL, NULL, FALSE, FALSE, FALSE, 10, 0),
+(4, 'Demo User', 'demo@demo.com', 'demo@demo.com', NULL, NULL, FALSE, FALSE, FALSE, 5, 0),
+(5, 'Manager', 'manager@company.com', 'manager@company.com', NULL, NULL, FALSE, FALSE, FALSE, 50, 5),
+(6, 'Readonly User', 'readonly@example.com', 'readonly@example.com', NULL, NULL, FALSE, TRUE, FALSE, 0, 0);
 
 -- Insert test groups
 INSERT INTO tc_groups (id, name, groupId) VALUES
@@ -65,17 +70,17 @@ INSERT INTO tc_events (id, type, serverTime, deviceId, positionId, geofenceId) V
 (8, 'deviceOffline', '2024-11-27 12:00:00', 4, NULL, NULL);
 
 -- Insert test commands
-INSERT INTO tc_commands (id, description, type, textChannel) VALUES
-(1, 'Get single position', 'positionSingle', FALSE),
-(2, 'Start periodic position tracking', 'positionPeriodic', FALSE),
-(3, 'Stop engine', 'engineStop', FALSE),
-(4, 'Resume engine', 'engineResume', FALSE),
-(5, 'Arm alarm', 'alarmArm', FALSE),
-(6, 'Disarm alarm', 'alarmDisarm', FALSE),
-(7, 'Reboot device', 'rebootDevice', FALSE),
-(8, 'Send SMS', 'sendSms', TRUE),
-(9, 'Request photo', 'requestPhoto', FALSE),
-(10, 'Custom command', 'custom', FALSE);
+INSERT INTO tc_commands (id, description, type, textChannel, attributes) VALUES
+(1, 'Get single position', 'positionSingle', FALSE, '{}'),
+(2, 'Start periodic position tracking', 'positionPeriodic', FALSE, '{}'),
+(3, 'Stop engine', 'engineStop', FALSE, '{}'),
+(4, 'Resume engine', 'engineResume', FALSE, '{}'),
+(5, 'Arm alarm', 'alarmArm', FALSE, '{}'),
+(6, 'Disarm alarm', 'alarmDisarm', FALSE, '{}'),
+(7, 'Reboot device', 'rebootDevice', FALSE, '{}'),
+(8, 'Send SMS', 'sendSms', TRUE, '{"message":"Test message"}'),
+(9, 'Request photo', 'requestPhoto', FALSE, '{}'),
+(10, 'Custom command', 'custom', FALSE, '{"data":"customData"}');
 
 -- Insert test notifications
 INSERT INTO tc_notifications (id, type, always, notificators) VALUES

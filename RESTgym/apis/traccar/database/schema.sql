@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS tc_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
     email VARCHAR(128) NOT NULL UNIQUE,
+    login VARCHAR(128),
     hashedPassword VARCHAR(128),
     salt VARCHAR(128),
     readonly BOOLEAN DEFAULT FALSE,
