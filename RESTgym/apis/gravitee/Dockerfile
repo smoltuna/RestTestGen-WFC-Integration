@@ -19,7 +19,7 @@ RUN apt-get update && \
         python3 \
         python3-pip \
         gnupg && \
-    pip3 install mitmproxy requests && \
+    pip3 install mitmproxy requests pymongo 'bcrypt<4.0.0' && \
     curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg && \
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
     apt-get update && \
@@ -52,8 +52,8 @@ COPY apis/gravitee/specifications/ /api/specifications/
 # Copy auth.py for mitmproxy
 COPY apis/gravitee/auth.py /api/auth.py
 
-# Copy user initialization script
-COPY apis/gravitee/init-user.py /api/init-user.py
+# Copy database user creation script
+COPY apis/gravitee/create-db-user.py /api/create-db-user.py
 
 # Copy gravitee-specific JaCoCo collection scripts
 COPY apis/gravitee/collect-coverage.sh /api/collect-coverage.sh
@@ -96,6 +96,9 @@ mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db\n\
 echo "Waiting for MongoDB to start..."\n\
 sleep 10\n\
 \n\
+echo "Creating user in MongoDB..."\n\
+python3 /api/create-db-user.py || echo "User creation completed with warnings"\n\
+\n\
 echo "Starting JaCoCo coverage collector..."\n\
 sh /api/collect-coverage-interval.sh &\n\
 JACOCO_PID=$!\n\
@@ -125,9 +128,6 @@ for i in {1..60}; do\n\
   fi\n\
   sleep 1\n\
 done\n\
-\n\
-echo "Initializing Gravitee user..."\n\
-python3 /api/init-user.py || echo "User initialization completed with warnings"\n\
 \n\
 echo "Starting mitmproxy..."\n\
 mitmdump -p 9090 --mode reverse:http://localhost:8083/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &\n\
