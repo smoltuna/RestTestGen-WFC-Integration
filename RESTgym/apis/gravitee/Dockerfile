@@ -129,6 +129,7 @@ for i in {1..60}; do\n\
   sleep 1\n\
 done\n\
 \n\
+
 echo "Starting mitmproxy..."\n\
 mitmdump -p 9090 --mode reverse:http://localhost:8083/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &\n\
 MITM_PID=$!\n\

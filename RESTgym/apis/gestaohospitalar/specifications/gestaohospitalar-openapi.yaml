@@ -5,7 +5,7 @@ info:
     \ Aceleradev Brasil\r\nJornada de desafios da Aceleradev Brasil - CodeNation"
   version: "1.0"
 servers:
-- url: //localhost:8080/
+- url: http://localhost:8080/
 tags:
 - name: location-resource
   description: Location Resource

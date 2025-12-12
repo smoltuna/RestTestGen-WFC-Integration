@@ -11,7 +11,8 @@
   },
   "servers": [
     {
-      "url": "http://localhost:9966/petclinic/api"
+      "url": "http://localhost:8080/petclinic/api",
+      "description": "Generated server url"
     }
   ],
   "tags": [

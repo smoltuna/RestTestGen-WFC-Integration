@@ -4,6 +4,7 @@ Session-based with signup
 """
 import requests
 import json
+from mitmproxy import ctx
 
 class GestaoHospitalarAuth:
     def __init__(self):
@@ -33,11 +34,11 @@ class GestaoHospitalarAuth:
                     # Get session cookie
                     if "JSESSIONID" in signup_response.cookies:
                         self.token = signup_response.cookies.get("JSESSIONID")
-                        print(f"[Gestao Hospitalar Auth] Session obtained")
+                        ctx.log.info(f"[Gestao Hospitalar Auth] Session obtained")
                 else:
-                    print(f"[Gestao Hospitalar Auth] Signup failed: {signup_response.status_code}")
+                    ctx.log.warn(f"[Gestao Hospitalar Auth] Signup failed: {signup_response.status_code}")
             except Exception as e:
-                print(f"[Gestao Hospitalar Auth] Error: {e}")
+                ctx.log.error(f"[Gestao Hospitalar Auth] Error: {e}")
         
         return self.token
     
