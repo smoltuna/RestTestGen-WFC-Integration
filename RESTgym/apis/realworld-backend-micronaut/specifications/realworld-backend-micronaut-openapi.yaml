@@ -10,6 +10,9 @@ info:
     name: MIT
     url: https://github.com/alexey-lapin/realworld-backend-micronaut/blob/master/LICENSE
   version: 0.1.0-master-SNAPSHOT
+servers:
+- url: http://localhost:9090
+  description: Test server
 externalDocs:
   description: GitHub alexey-lapin/realworld-backend-micronaut
   url: https://github.com/alexey-lapin/realworld-backend-micronaut
