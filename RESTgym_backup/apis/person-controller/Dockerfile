@@ -1,1 +1,0 @@
-FROM restgym/person-controller-api:1.0.0

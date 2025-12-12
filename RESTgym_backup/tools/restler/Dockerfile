@@ -1,1 +1,0 @@
-FROM restgym/restler-tool:1.0.0

@@ -1,1 +1,0 @@
-FROM restgym/genome-nexus-api:1.0.0

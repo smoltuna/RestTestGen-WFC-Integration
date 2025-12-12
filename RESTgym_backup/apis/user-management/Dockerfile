@@ -1,1 +1,0 @@
-FROM restgym/user-management-api:1.0.0

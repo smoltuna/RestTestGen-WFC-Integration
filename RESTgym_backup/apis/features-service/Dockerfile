@@ -1,1 +1,0 @@
-FROM restgym/features-service-api:1.0.0

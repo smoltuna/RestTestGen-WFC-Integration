@@ -1,1 +1,0 @@
-FROM restgym/morest-tool:1.0.0
