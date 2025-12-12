@@ -55,6 +55,11 @@ COPY apis/gravitee/auth.py /api/auth.py
 # Copy user initialization script
 COPY apis/gravitee/init-user.py /api/init-user.py
 
+# Copy gravitee-specific JaCoCo collection scripts
+COPY apis/gravitee/collect-coverage.sh /api/collect-coverage.sh
+COPY apis/gravitee/collect-coverage-interval.sh /api/collect-coverage-interval.sh
+RUN chmod +x /api/collect-coverage.sh /api/collect-coverage-interval.sh
+
 COPY apis/infrastructure/ /infrastructure/
 
 # Upgrade JaCoCo to 0.8.12 for Java 21 support (Gravitee requires Java 21)
@@ -92,7 +97,7 @@ echo "Waiting for MongoDB to start..."\n\
 sleep 10\n\
 \n\
 echo "Starting JaCoCo coverage collector..."\n\
-sh /infrastructure/jacoco/collect-coverage-interval.sh &\n\
+sh /api/collect-coverage-interval.sh &\n\
 JACOCO_PID=$!\n\
 \n\
 echo "Starting Gravitee API in background..."\n\
