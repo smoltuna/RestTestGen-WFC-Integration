@@ -9,7 +9,7 @@ RUN mkdir /api && \
     mkdir /results && \
     apt update && \
     apt -y upgrade && \
-    apt -y install openjdk-17-jdk mitmproxy && \
+    apt -y install openjdk-17-jdk mitmproxy python3-requests curl && \
     apt -y autoremove
 
 COPY ./apis/keycloak/ /api/
@@ -18,11 +18,13 @@ COPY ./apis/keycloak/ /api/
 COPY apis/keycloak/specifications/ /api/specifications/
 
 COPY apis/infrastructure/ /infrastructure/
-COPY apis/keycloak/auth.py /api/
 
 ENV JAVA_OPTS="-Xms256m -Xmx2048m"
 ENV KC_HOME_DIR=/api
 ENV KC_CONF_DIR=/api/conf
+
+# Expose ports
+EXPOSE 9090 12345 8080
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
@@ -68,8 +70,19 @@ MITM_PID=$!\n\
 echo "Waiting for mitmproxy to start..."\n\
 sleep 10\n\
 \n\
-echo "Services started. Waiting for Keycloak process..."\n\
-wait $KEYCLOAK_PID\n\
+echo "Services started and ready for testing."\n\
+echo "Mitmproxy PID: $MITM_PID"\n\
+echo "Keycloak PID: $KEYCLOAK_PID"\n\
+echo "JaCoCo PID: $JACOCO_PID"\n\
+\n\
+# Keep container running - wait for all processes\n\
+while kill -0 $KEYCLOAK_PID 2>/dev/null && kill -0 $MITM_PID 2>/dev/null; do\n\
+  sleep 5\n\
+done\n\
+\n\
+echo "One or more services stopped. Shutting down..."\n\
+kill $KEYCLOAK_PID $MITM_PID $JACOCO_PID 2>/dev/null || true\n\
+wait\n\
 ' > /start.sh && chmod +x /start.sh
 
 CMD ["/bin/bash", "/start.sh"]

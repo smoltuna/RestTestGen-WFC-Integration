@@ -25,6 +25,7 @@ eggs/
 lib/
 lib64/
 !apis/traccar/lib/
+!apis/keycloak/lib/
 parts/
 sdist/
 var/
