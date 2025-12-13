@@ -17,8 +17,7 @@ COPY apis/infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080
 
-CMD mkdir -p /results/$API/$TOOL/$RUN/{code-coverage,logs} && \
-    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
+CMD cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     echo "Starting Quartz Manager..." && \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=it.fabioformosa.*,output=tcpserver,port=12345,address=* \
         -Dspring.config.location=file:/api/application.properties \
