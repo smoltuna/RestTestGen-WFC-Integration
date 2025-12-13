@@ -479,48 +479,131 @@
         }
       },
 
-      "SimpleTriggerDTO": {
+      "SimpleTriggerInputDTO": {
         "type": "object",
+        "required": ["jobClass"],
         "properties": {
-          "comment": {
+          "jobClass": {
             "type": "string",
-            "example": "Definizione segnaposto: aggiungi qui le proprietà reali"
+            "description": "Fully qualified job class name",
+            "example": "it.fabioformosa.quartzmanager.jobs.SampleJob"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Trigger start date (ISO 8601)",
+            "example": "2025-12-13T10:00:00.000Z"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Trigger end date (ISO 8601)",
+            "example": "2025-12-31T23:59:59.000Z"
+          },
+          "misfireInstruction": {
+            "type": "string",
+            "enum": ["MISFIRE_INSTRUCTION_FIRE_NOW", "MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT", "MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT", "MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT", "MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT"],
+            "default": "MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT"
+          },
+          "repeatCount": {
+            "type": "integer",
+            "description": "Number of times to repeat (-1 for infinite)",
+            "example": 10
+          },
+          "repeatInterval": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Interval between repeats in milliseconds",
+            "minimum": 1,
+            "example": 60000
+          },
+          "jobDataMap": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional job data as key-value pairs"
           }
         }
       },
-      "SimpleTriggerInputDTO": {
+      "SimpleTriggerDTO": {
         "type": "object",
         "properties": {
-          "comment": {
+          "name": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "jobClass": {
+            "type": "string"
+          },
+          "startDate": {
             "type": "string",
-            "example": "Definizione segnaposto: aggiungi qui le proprietà reali"
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "repeatCount": {
+            "type": "integer"
+          },
+          "repeatInterval": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
       "TriggerDTO": {
         "type": "object",
         "properties": {
-          "comment": {
+          "name": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "jobClass": {
+            "type": "string"
+          },
+          "startDate": {
             "type": "string",
-            "example": "Definizione segnaposto: aggiungi qui le proprietà reali"
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
       "TriggerKeyDTO": {
         "type": "object",
         "properties": {
-          "comment": {
-            "type": "string",
-            "example": "Definizione segnaposto: aggiungi qui le proprietà reali"
+          "name": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
           }
         }
       },
       "SchedulerDTO": {
         "type": "object",
         "properties": {
-          "comment": {
+          "name": {
+            "type": "string"
+          },
+          "instanceId": {
+            "type": "string"
+          },
+          "status": {
             "type": "string",
-            "example": "Definizione segnaposto: aggiungi qui le proprietà reali"
+            "enum": ["STARTED", "STOPPED", "PAUSED"]
+          },
+          "triggerKeys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TriggerKeyDTO"
+            }
           }
         }
       }

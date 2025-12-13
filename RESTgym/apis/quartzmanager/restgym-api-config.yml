@@ -1,2 +1,2 @@
-# RESTgym API Configuration
-enabled: false
+# RESTgym API Configuration for Quartz Manager
+enabled: true

@@ -1,29 +1,43 @@
-"""
-Quartz Manager - Authentication Script
-Basic Auth (if configured)
-"""
-import base64
+import requests
+from mitmproxy import http
 
-class QuartzAuth:
+class QuartzAuthJWT:
     def __init__(self):
-        # Quartz Manager può essere configurato senza auth
-        # Usa credenziali base se configurate
         self.username = "restapitestteam@gmail.com"
         self.password = "universe"
-        self.auth_header = None
-        self.enabled = False  # Set to True if auth is configured
+        self.jwt_token = None
+        self.login_url = "http://localhost:8080/quartz-manager/auth/login"
+        self.context_path = "/quartz-manager"
+        
+    def get_jwt_token(self):
+        if self.jwt_token:
+            return self.jwt_token
+        
+        try:
+            response = requests.post(
+                self.login_url,
+                data={"username": self.username, "password": self.password},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                token_data = response.json()
+                self.jwt_token = token_data.get('accessToken')
+                if self.jwt_token:
+                    print(f"[QuartzAuth] Successfully obtained JWT token")
+                return self.jwt_token
+            else:
+                print(f"[QuartzAuth] Login failed: {response.status_code}")
+        except Exception as e:
+            print(f"[QuartzAuth] Error: {e}")
+        
+        return None
     
-    def get_auth_header(self):
-        if self.auth_header is None and self.enabled:
-            credentials = f"{self.username}:{self.password}"
-            encoded = base64.b64encode(credentials.encode()).decode()
-            self.auth_header = f"Basic {encoded}"
-        return self.auth_header
-    
-    def request(self, flow):
-        if self.enabled:
-            auth = self.get_auth_header()
-            if auth:
-                flow.request.headers["Authorization"] = auth
+    def request(self, flow: http.HTTPFlow):
+        if "/auth/login" not in flow.request.path and self.context_path in flow.request.path:
+            token = self.get_jwt_token()
+            if token:
+                flow.request.headers["Authorization"] = f"Bearer {token}"
 
-addons = [QuartzAuth()]
+addons = [QuartzAuthJWT()]
