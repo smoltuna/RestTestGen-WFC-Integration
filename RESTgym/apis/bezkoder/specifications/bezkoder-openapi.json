@@ -50,7 +50,8 @@
                         "schema": {
                             "type": "integer",
                             "format": "int64"
-                        }
+                        },
+                        "example": 1
                     }
                 ],
                 "responses": {
@@ -88,7 +89,8 @@
                         "schema": {
                             "type": "integer",
                             "format": "int64"
-                        }
+                        },
+                        "example": 1
                     }
                 ],
                 "requestBody": {
@@ -136,7 +138,8 @@
                         "schema": {
                             "type": "integer",
                             "format": "int64"
-                        }
+                        },
+                        "example": 1
                     }
                 ],
                 "responses": {
