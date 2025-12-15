@@ -18,13 +18,19 @@ COPY ./apis/keycloak/ /api/
 COPY apis/keycloak/specifications/ /api/specifications/
 
 COPY apis/infrastructure/ /infrastructure/
+COPY apis/keycloak/auth.py /api/
 
-ENV JAVA_OPTS="-Xms256m -Xmx2048m"
 ENV KC_HOME_DIR=/api
 ENV KC_CONF_DIR=/api/conf
 
-# Expose ports
-EXPOSE 9090 12345 8080
+# Expose ports - must be before CMD/ENTRYPOINT
+EXPOSE 8080 9090 12345
+
+# Pre-build Keycloak to avoid runtime build issues
+RUN cd /api && \
+    export KEYCLOAK_ADMIN=admin && \
+    export KEYCLOAK_ADMIN_PASSWORD=admin && \
+    ./bin/kc.sh build --health-enabled=true 2>&1 | tee /tmp/keycloak-prebuild.log || echo "Pre-build completed with warnings"
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
@@ -37,14 +43,10 @@ echo "Starting JaCoCo coverage collector..."\n\
 sh /infrastructure/jacoco/collect-coverage-interval.sh &\n\
 JACOCO_PID=$!\n\
 \n\
-echo "Building Keycloak (required on first run)..."\n\
+echo "Starting Keycloak in background..."\n\
 cd /api\n\
 export KEYCLOAK_ADMIN=admin\n\
 export KEYCLOAK_ADMIN_PASSWORD=admin\n\
-export JAVA_OPTS="-Xms256m -Xmx2048m"\n\
-./bin/kc.sh build --health-enabled=true > /results/$API/$TOOL/$RUN/logs/keycloak-build.log 2>&1\n\
-\n\
-echo "Starting Keycloak in background..."\n\
 export JAVA_OPTS="-javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.keycloak.*,output=tcpserver,port=12345,address=* -Xms256m -Xmx2048m"\n\
 ./bin/kc.sh start-dev --http-port=8080 > /results/$API/$TOOL/$RUN/logs/keycloak-stdout.log 2>&1 &\n\
 KEYCLOAK_PID=$!\n\
