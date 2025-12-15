@@ -1,0 +1,672 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Alfresco Content Services REST API",
+    "description": "**Model API**\n\nProvides access to the model features of Alfresco Content Services.\n",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/alfresco/api/-default-/public/alfresco/versions/1"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "aspects",
+      "description": "Retrieve and manage aspects"
+    },
+    {
+      "name": "types",
+      "description": "Retrieve and manage types"
+    }
+  ],
+  "paths": {
+    "/aspects": {
+      "get": {
+        "tags": [
+          "aspects"
+        ],
+        "summary": "List aspects",
+        "description": "**Note:** This is available in Alfresco 7.0.0 and newer versions.\n\nGets a list of aspects from the data dictionary. The System aspects will be ignored by default.\n```JSON\n{\n  \"list\": {\n    \"pagination\": {\n      \"count\": 0,\n      \"hasMoreItems\": true,\n      \"totalItems\": 0,\n      \"skipCount\": 0,\n      \"maxItems\": 0\n    },\n    \"entries\": [\n      {\n        \"entry\": {\n          \"associations\": [],\n          \"mandatoryAspects\": [],\n          \"includedInSupertypeQuery\": true,\n          \"description\": \"Titled\",\n          \"isContainer\": false,\n          \"model\": {\n              \"id\": \"cm:contentmodel\",\n              \"author\": \"Alfresco\",\n              \"description\": \"Alfresco Content Domain Model\",\n              \"namespaceUri\": \"http://www.alfresco.org/model/content/1.0\",\n              \"namespacePrefix\": \"cm\"\n          },\n          \"id\": \"cm:titled\",\n          \"title\": \"Titled\",\n          \"properties\": [\n            {\n              \"id\": \"cm:title\",\n              \"title\": \"Title\",\n              \"description\": \"Content Title\",\n              \"dataType\": \"d:mltext\",\n              \"isMultiValued\": false,\n              \"isMandatory\": false,\n              \"isMandatoryEnforced\": false,\n              \"isProtected\": false\n            },\n            {\n              ...\n            }\n          ]\n        }\n      },\n      {\n        \"entry\": {\n          ...\n        }\n      },\n      {\n        \"entry\": {\n          ...\n        }\n      },\n    ]\n  }\n}\n```\n",
+        "operationId": "listAspects",
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "description": "Optionally filter the list. Here are some examples:\n\nAn aspect should represented in the following format(`prefix:name`). e.g 'cm:title'.\n\nThe following where clause will only return aspects from the `namespace1:model` and `namespace2:model`.\n  ```\n  where=(modelId in ('namespace1:model','namespace2:model'))\n  where=(modelId in ('namespace1:model INCLUDESUBASPECTS','namespace2:model'))\n  ```\n\nThe following where clause will only return sub aspects for the given parents.\n  ```\n  where=(parentId in ('namespace1:parent','namespace2:parent'))\n  ```\n\nThe following where clause will only return aspects that match the pattern.\n  ```\n  where=(namespaceUri matches('http://www.alfresco.*'))\n  ```\n\nThe following where clause will only return aspects that don't match the pattern.\n  ```\n  where=(not namespaceUri matches('http://www.alfresco.*'))\n  ```\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skipCount",
+            "in": "query",
+            "description": "The number of entities that exist in the collection before those included in this list.\nIf not supplied then the default value is 0.\n",
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "maxItems",
+            "in": "query",
+            "description": "The maximum number of items to return in the list.\nIf not supplied then the default value is 100.\n",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 100
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Returns additional information about the aspect. The following optional fields can be requested:\n* properties\n* mandatoryAspects\n* associations\n",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AspectPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {}
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "7.0.0"
+      }
+    },
+    "/aspects/{aspectId}": {
+      "get": {
+        "tags": [
+          "aspects"
+        ],
+        "summary": "Get an aspect",
+        "description": "**Note:** This is available in Alfresco 7.0.0 and newer versions.\nGet information for aspect **aspectId**.\n",
+        "operationId": "getAspect",
+        "parameters": [
+          {
+            "name": "aspectId",
+            "in": "path",
+            "description": "The Qname of an aspect(`prefix:name`) e.g 'cm:title'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AspectEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameter: unknown aspectId scheme specified\n",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {}
+          },
+          "404": {
+            "description": "**aspectId** does not exist\n",
+            "content": {}
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "7.0.0"
+      }
+    },
+    "/types": {
+      "get": {
+        "tags": [
+          "types"
+        ],
+        "summary": "List types",
+        "description": "**Note:** This is available in Alfresco 7.0.0 and newer versions.\n\nGets a list of types from the data dictionary. The System types will be ignored by default.\n```JSON\n{\n  \"list\": {\n    \"pagination\": {\n      \"count\": 0,\n      \"hasMoreItems\": true,\n      \"totalItems\": 0,\n      \"skipCount\": 0,\n      \"maxItems\": 0\n    },\n    \"entries\": [\n      {\n        \"entry\": {\n          \"associations\": [],\n          \"isArchive\": true,\n          \"mandatoryAspects\": [\n              \"cm:auditable\",\n              \"sys:referenceable\",\n              \"sys:localized\"\n          ],\n          \"includedInSupertypeQuery\": true,\n          \"description\": \"Base Content Object\",\n          \"isContainer\": false,\n          \"model\": {\n              \"id\": \"cm:contentmodel\",\n              \"author\": \"Alfresco\",\n              \"description\": \"Alfresco Content Domain Model\",\n              \"namespaceUri\": \"http://www.alfresco.org/model/content/1.0\",\n              \"namespacePrefix\": \"cm\"\n          },\n          \"id\": \"cm:content\",\n          \"title\": \"Content\",\n          \"parentId\": \"cm:cmobject\"\n          \"properties\": [\n            {\n              \"id\": \"cm:name\",\n              \"title\": \"Name\",\n              \"description\": \"Name\",\n              \"dataType\": \"d:text\",\n              \"isMultiValued\": false,\n              \"isMandatory\": true,\n              \"isMandatoryEnforced\": true\n              \"isProtected\": false\n              ...\n            },\n            {\n              ...\n            }\n          ]\n        }\n      },\n      {\n        \"entry\": {\n          ...\n        }\n      },\n      {\n        \"entry\": {\n          ...\n        }\n      },\n    ]\n  }\n}\n```\n",
+        "operationId": "listTypes",
+        "parameters": [
+          {
+            "name": "where",
+            "in": "query",
+            "description": "Optionally filter the list. Here are some examples:\n\nA type should represented in the following format(`prefix:name`). e.g 'cm:content'.\n\nThe following where clause will only return types from the `namespace1:model` and `namespace2:model`.\n  ```\n  where=(modelId in ('namespace1:model','namespace2:model'))\n  where=(modelId in ('namespace1:model INCLUDESUBTYPES','namespace2:model'))\n  ```\n\nThe following where clause will only return sub types for the given parents.\n  ```\n  where=(parentId in ('namespace1:parent','namespace2:parent'))\n  ```\n\nThe following where clause will only return types that match the pattern.\n  ```\n  where=(namespaceUri matches('http://www.alfresco.*'))\n  ```\n\nThe following where clause will only return types that don't match the pattern.\n  ```\n  where=(not namespaceUri matches('http://www.alfresco.*'))\n  ```\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skipCount",
+            "in": "query",
+            "description": "The number of entities that exist in the collection before those included in this list.\nIf not supplied then the default value is 0.\n",
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "maxItems",
+            "in": "query",
+            "description": "The maximum number of items to return in the list.\nIf not supplied then the default value is 100.\n",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 100
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Returns additional information about the type. The following optional fields can be requested:\n* properties\n* mandatoryAspects\n* associations\n",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypePaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {}
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "7.0.0"
+      }
+    },
+    "/types/{typeId}": {
+      "get": {
+        "tags": [
+          "types"
+        ],
+        "summary": "Get a type",
+        "description": "**Note:** This is available in Alfresco 7.0.0 and newer versions.\nGet information for type **typeId**.\n",
+        "operationId": "getType",
+        "parameters": [
+          {
+            "name": "typeId",
+            "in": "path",
+            "description": "The Qname of a type(`prefix:name`) e.g 'cm:content'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypeEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameter: unknown typeId scheme specified\n",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {}
+          },
+          "404": {
+            "description": "**typeId** does not exist\n",
+            "content": {}
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-alfresco-since": "7.0.0"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "required": [
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "required": [
+              "briefSummary",
+              "descriptionURL",
+              "stackTrace",
+              "statusCode"
+            ],
+            "type": "object",
+            "properties": {
+              "errorKey": {
+                "type": "string"
+              },
+              "statusCode": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "briefSummary": {
+                "type": "string"
+              },
+              "stackTrace": {
+                "type": "string"
+              },
+              "descriptionURL": {
+                "type": "string"
+              },
+              "logId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "The number of objects in the entries array.\n",
+            "format": "int64"
+          },
+          "hasMoreItems": {
+            "type": "boolean",
+            "description": "A boolean value which is **true** if there are more entities in the collection\nbeyond those in this response. A true value means a request with a larger value\nfor the **skipCount** or the **maxItems** parameter will return more entities.\n"
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "An integer describing the total number of entities in the collection.\nThe API might not be able to determine this value,\nin which case this property will not be present.\n",
+            "format": "int64"
+          },
+          "skipCount": {
+            "type": "integer",
+            "description": "An integer describing how many entities exist in the collection before\nthose included in this list. If there was no **skipCount** parameter then the\ndefault value is 0.\n",
+            "format": "int64"
+          },
+          "maxItems": {
+            "type": "integer",
+            "description": "The value of the **maxItems** parameter used to generate this list.\nIf there was no **maxItems** parameter then the default value is 100.\n",
+            "format": "int64"
+          }
+        }
+      },
+      "AspectPaging": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AspectEntry"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AspectEntry": {
+        "required": [
+          "entry"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/Aspect"
+          }
+        }
+      },
+      "Aspect": {
+        "$ref": "#/components/schemas/AbstractClass"
+      },
+      "TypePaging": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TypeEntry"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TypeEntry": {
+        "required": [
+          "entry"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/Type"
+          }
+        }
+      },
+      "Type": {
+        "$ref": "#/components/schemas/AbstractClass"
+      },
+      "AbstractClass": {
+        "required": [
+          "id",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Property"
+            }
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "isArchive": {
+            "type": "boolean"
+          },
+          "includedInSupertypeQuery": {
+            "type": "boolean"
+          },
+          "mandatoryAspects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "associations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbstractClassAssociation"
+            }
+          },
+          "model": {
+            "$ref": "#/components/schemas/Model"
+          }
+        }
+      },
+      "Property": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "the human-readable title"
+          },
+          "description": {
+            "type": "string",
+            "description": "the human-readable description"
+          },
+          "defaultValue": {
+            "type": "string",
+            "description": "the default value"
+          },
+          "dataType": {
+            "type": "string",
+            "description": "the name of the property type (e.g. d:text)"
+          },
+          "isMultiValued": {
+            "type": "boolean",
+            "description": "define if the property is multi-valued"
+          },
+          "isMandatory": {
+            "type": "boolean",
+            "description": "define if the property is mandatory"
+          },
+          "isMandatoryEnforced": {
+            "type": "boolean",
+            "description": "define if the presence of mandatory properties is enforced"
+          },
+          "isProtected": {
+            "type": "boolean",
+            "description": "define if the property is system maintained"
+          },
+          "constraints": {
+            "type": "array",
+            "description": "list of constraints defined for the property",
+            "items": {
+              "$ref": "#/components/schemas/Constraint"
+            }
+          }
+        }
+      },
+      "Constraint": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "the type of the constraint"
+          },
+          "title": {
+            "type": "string",
+            "description": "the human-readable constraint title"
+          },
+          "description": {
+            "type": "string",
+            "description": "the human-readable constraint description"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      },
+      "Model": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "namespaceUri": {
+            "type": "string"
+          },
+          "namespacePrefix": {
+            "type": "string"
+          }
+        }
+      },
+      "AbstractClassAssociation": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "isChild": {
+            "type": "boolean"
+          },
+          "isProtected": {
+            "type": "boolean"
+          },
+          "source": {
+            "$ref": "#/components/schemas/AbstractClassAssociationSource"
+          },
+          "target": {
+            "$ref": "#/components/schemas/AbstractClassAssociationSource"
+          }
+        }
+      },
+      "AbstractClassAssociationSource": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "cls": {
+            "type": "string"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "isMany": {
+            "type": "boolean"
+          },
+          "isMandatoryEnforced": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "skipCountParam": {
+        "name": "skipCount",
+        "in": "query",
+        "description": "The number of entities that exist in the collection before those included in this list.\nIf not supplied then the default value is 0.\n",
+        "schema": {
+          "minimum": 0,
+          "type": "integer",
+          "default": 0
+        }
+      },
+      "maxItemsParam": {
+        "name": "maxItems",
+        "in": "query",
+        "description": "The maximum number of items to return in the list.\nIf not supplied then the default value is 100.\n",
+        "schema": {
+          "minimum": 1,
+          "type": "integer",
+          "default": 100
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "description": "HTTP Basic Authentication",
+        "scheme": "basic"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}
