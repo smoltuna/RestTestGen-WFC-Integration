@@ -2,6 +2,7 @@ FROM restgym/resttestgen-tool:1.0.0
 
 # Copy API specifications into the tool image
 
+COPY apis/alfresco/specifications/* /specifications/
 COPY apis/bezkoder/specifications/* /specifications/
 COPY apis/blog/specifications/* /specifications/
 COPY apis/cassandra-management-api/specifications/* /specifications/

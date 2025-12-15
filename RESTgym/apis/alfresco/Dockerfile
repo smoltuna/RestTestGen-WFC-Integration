@@ -22,8 +22,8 @@ RUN dnf install -y \
         postgresql-contrib && \
     dnf clean all
 
-# Install mitmproxy
-RUN pip3 install mitmproxy
+# Install mitmproxy and requests
+RUN pip3 install mitmproxy requests
 
 # Initialize PostgreSQL data directory
 RUN mkdir -p /var/lib/pgsql/data && \
