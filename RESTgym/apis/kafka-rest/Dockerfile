@@ -39,6 +39,10 @@ RUN pip3 install mitmproxy
 # Copy RESTgym infrastructure
 COPY apis/infrastructure/ /infrastructure/
 
+COPY apis/kafka-rest/specifications/ /api/specifications/
+
+
+
 # Copy Kafka REST binaries and scripts from official image
 COPY --from=kafka-rest-base /usr/share/java/kafka-rest-lib /usr/share/java/kafka-rest-lib
 COPY --from=kafka-rest-base /usr/share/java/kafka-rest-bin /usr/share/java/kafka-rest-bin
@@ -59,19 +63,11 @@ RUN cd /api/classes && \
 # Set working directory
 WORKDIR /etc/kafka-rest
 
-# Expose ports
-# 8082: Kafka REST Proxy
-# 9090: MITMProxy (RESTgym standard)
-# 12345: JaCoCo TCP server
 EXPOSE 8082 9090 12345
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -f http://localhost:8082/ || exit 1
 
-# Container execution command (RESTgym template pattern)
-# Note: This requires external Kafka and Schema Registry
-# Use docker-compose for full stack, or set KAFKA_REST_BOOTSTRAP_SERVERS externally
+
+
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \

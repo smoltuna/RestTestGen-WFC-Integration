@@ -22,8 +22,11 @@ RUN apt-get update && \
 
 RUN pip3 install mitmproxy
 
-COPY apis/bezkoder/ /api/
+COPY apis/bezkoder/spring-boot-swagger-3-example-0.0.1-SNAPSHOT.jar /api/bezkoder.jar
 
+COPY apis/bezkoder/classes/ /api/classes/
+
+COPY apis/bezkoder/specifications/ /api/specifications/
 
 COPY apis/infrastructure/ /infrastructure/
 

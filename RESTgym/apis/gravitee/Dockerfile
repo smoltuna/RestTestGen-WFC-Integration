@@ -63,8 +63,11 @@ RUN chmod +x /api/collect-coverage.sh /api/collect-coverage-interval.sh
 COPY apis/infrastructure/ /infrastructure/
 
 # Upgrade JaCoCo to 0.8.12 for Java 21 support (Gravitee requires Java 21)
-RUN wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar -O /infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar && \
-    wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar -O /infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar
+#RUN wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar -O /infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar && \
+#    wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar -O /infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar
+
+COPY apis/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar /infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar
+COPY apis/infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar /infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar
 
 # Expose RESTgym standard ports
 # 9090: mitmproxy (reverse proxy to Gravitee)

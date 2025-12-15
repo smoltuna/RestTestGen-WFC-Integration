@@ -15,7 +15,7 @@ COPY apis/gravitee/specifications/* /specifications/
 COPY apis/kafka-rest/specifications/* /specifications/
 COPY apis/keycloak/specifications/* /specifications/
 COPY apis/languagetool/specifications/* /specifications/
-COPY apis/liferay/specifications/* /specifications/
+#COPY apis/liferay/specifications/* /specifications/
 COPY apis/market/specifications/* /specifications/
 COPY apis/microcks/specifications/* /specifications/
 COPY apis/ncs/specifications/* /specifications/
