@@ -16,40 +16,8 @@
   },
   "servers": [
     {
-      "url": "https://demo.traccar.org/api",
-      "description": "Demo Server 1"
-    },
-    {
-      "url": "https://demo2.traccar.org/api",
-      "description": "Demo Server 2"
-    },
-    {
-      "url": "https://demo3.traccar.org/api",
-      "description": "Demo Server 3"
-    },
-    {
-      "url": "https://demo4.traccar.org/api",
-      "description": "Demo Server 4"
-    },
-    {
-      "url": "https://server.traccar.org/api",
-      "description": "Subscription Server"
-    },
-    {
-      "url": "http://{host}:{port}/api",
-      "description": "Other Server",
-      "variables": {
-        "host": {
-          "default": "localhost"
-        },
-        "port": {
-          "enum": [
-            "8082",
-            "80"
-          ],
-          "default": "8082"
-        }
-      }
+      "url": "http://localhost:8080/api",
+      "description": "Local Server 1"
     }
   ],
   "security": [

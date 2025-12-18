@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Constants
-RESTGYM="RESTgym"
+RESTGYM="RESTgymi"
 DOCKER_CMD="docker"
-RESTGYM_IMAGE_NAME="restgym"
+RESTGYM_IMAGE_NAME="restgymi"
 RESTGYM_BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOCKER_SOCKET_HOST="/var/run/docker.sock"
 DOCKER_SOCKET_CONTAINER="/var/run/docker.sock"
-DOCKER_BASE_COMMAND="$DOCKER_CMD run --rm --name restgym -it -v $DOCKER_SOCKET_HOST:$DOCKER_SOCKET_CONTAINER -v $RESTGYM_BASE_DIR/apis:/app/apis:ro -v $RESTGYM_BASE_DIR/tools:/app/tools:ro -v $RESTGYM_BASE_DIR/results:/app/results -v $RESTGYM_BASE_DIR/restgym-config.yml:/app/restgym-config.yml:ro -e RESTGYM_BASE_DIR=$RESTGYM_BASE_DIR $RESTGYM_IMAGE_NAME"
+DOCKER_BASE_COMMAND="$DOCKER_CMD run --rm --name restgymi -it -v $DOCKER_SOCKET_HOST:$DOCKER_SOCKET_CONTAINER -v $RESTGYM_BASE_DIR/apis:/app/apis:ro -v $RESTGYM_BASE_DIR/tools:/app/tools:ro -v $RESTGYM_BASE_DIR/results:/app/results -v $RESTGYM_BASE_DIR/restgym-config.yml:/app/restgym-config.yml:ro -e RESTGYM_BASE_DIR=$RESTGYM_BASE_DIR $RESTGYM_IMAGE_NAME"
 
 
 # Check if Docker is installed, else exit
@@ -71,7 +71,7 @@ case "$1" in
   # Stops all RESTgym-related containers
   force-stop|s)
     # List container IDs whose names include "restgym"
-    containers=$($DOCKER_CMD ps -qa --filter "name=restgym")
+    containers=$($DOCKER_CMD ps -qa --filter "name=restgymi")
     if [ -z "$containers" ]; then
       echo "No $RESTGYM containers are running."
       exit 0

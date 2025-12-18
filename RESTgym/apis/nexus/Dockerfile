@@ -67,7 +67,6 @@ EXPOSE 8081 9090 12345
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl -f http://localhost:8081/ || exit 1
 
-# Jacoco da rivedere
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /api/collect-coverage-interval.sh & \
