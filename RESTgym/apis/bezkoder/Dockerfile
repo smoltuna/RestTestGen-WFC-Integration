@@ -34,4 +34,4 @@ CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* \
         -Dfile.encoding=UTF-8 \
         -Dserver.port=8080 \
-        -jar /api/bezkoder.jar
+        -jar /api/spring-boot-swagger-3-example-0.0.1-SNAPSHOT.jar

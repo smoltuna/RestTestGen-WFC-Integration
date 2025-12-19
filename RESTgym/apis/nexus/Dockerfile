@@ -46,12 +46,7 @@ COPY --from=nexus-base /opt/sonatype/nexus /opt/sonatype/nexus
 COPY --from=nexus-base /opt/sonatype/sonatype-work /opt/sonatype/sonatype-work
 
 
-RUN mkdir -p /nexus-data /sonatype-work /api/classes
-
-
-RUN cd /api/classes && \
-    unzip -q /opt/sonatype/nexus/bin/sonatype-nexus-repository-*.jar 'BOOT-INF/classes/org/sonatype/**/*.class' 'BOOT-INF/classes/com/sonatype/**/*.class' 2>/dev/null || true && \
-    if [ -d BOOT-INF/classes ]; then mv BOOT-INF/classes/* . && rm -rf BOOT-INF; fi
+RUN mkdir -p /nexus-data /sonatype-work
 
 
 WORKDIR /opt/sonatype/nexus
