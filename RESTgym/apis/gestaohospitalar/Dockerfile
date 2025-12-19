@@ -29,11 +29,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY apis/gestaohospitalar/gestaohospitalar-0.0.1.jar /api/gestaohospitalar.jar
-COPY apis/gestaohospitalar/classes/ /api/classes/
-COPY apis/gestaohospitalar/database/ /api/database/
-COPY apis/gestaohospitalar/specifications/ /api/specifications/
-COPY apis/gestaohospitalar/auth.py /api/auth.py
+# Copy all API files (jar, classes, database, specifications, auth, entrypoint)
+COPY ./apis/gestaohospitalar/ /api/
 COPY apis/infrastructure/ /infrastructure/
 
 # Expose ports

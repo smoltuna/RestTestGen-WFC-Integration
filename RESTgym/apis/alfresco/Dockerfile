@@ -33,19 +33,13 @@ RUN mkdir -p /var/lib/pgsql/data && \
 # Create RESTgym directories
 RUN mkdir -p /api /infrastructure /results
 
-# Copy OpenAPI specifications for test generation
-COPY apis/alfresco/specifications/ /api/specifications/
-
-# Copy infrastructure tools from common RESTgym infrastructure
+# Copy all API files (specifications, classes, auth, entrypoint)
+COPY ./apis/alfresco/ /api/
 COPY apis/infrastructure/ /infrastructure/
 
-# Copy authentication script
-COPY apis/alfresco/auth.py /infrastructure/mitmproxy/auth.py
+# Move auth.py to mitmproxy directory for compatibility
+RUN cp /api/auth.py /infrastructure/mitmproxy/auth.py
 
-# Copy pre-extracted Alfresco class files for JaCoCo coverage analysis
-COPY apis/alfresco/classes/ /api/classes/
-
-# Copy entrypoint script
 COPY apis/alfresco/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

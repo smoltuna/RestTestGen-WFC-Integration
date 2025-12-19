@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 
 echo "Starting Ganache..."
 ganache --wallet.deterministic --wallet.totalAccounts 10 --wallet.defaultBalance 100 --chain.networkId 1337 --server.host 0.0.0.0 --server.port 8545 > /results/$API/$TOOL/$RUN/ganache.log 2>&1 &

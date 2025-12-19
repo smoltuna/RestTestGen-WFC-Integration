@@ -15,12 +15,12 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY apis/notebookmanager/notebookmanager.jar /api/notebookmanager.jar
-COPY apis/notebookmanager/classes/ /api/classes/
-COPY apis/notebookmanager/database/ /api/database/
-COPY apis/notebookmanager/entrypoint.sh /entrypoint.sh
+# Copy all API files
+COPY ./apis/notebookmanager/ /api/
 COPY apis/infrastructure/ /infrastructure/
 
+# Copy entrypoint separately for proper permissions
+COPY apis/notebookmanager/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 CMD ["/entrypoint.sh"]

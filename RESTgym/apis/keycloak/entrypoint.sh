@@ -2,7 +2,6 @@
 set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
 mkdir -p /results/$API/$TOOL/$RUN/logs
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 
 echo "Starting JaCoCo coverage collector..."
 sh /infrastructure/jacoco/collect-coverage-interval.sh &

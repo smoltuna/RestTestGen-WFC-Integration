@@ -18,7 +18,8 @@ RUN apt-get update && \
         sqlite3 \
         python3 \
         python3-pip \
-        gnupg && \
+        gnupg \
+        unzip && \
     pip3 install mitmproxy requests pymongo 'bcrypt<4.0.0' && \
     curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg && \
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
@@ -28,42 +29,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Gravitee Management API
-RUN wget -q https://download.gravitee.io/graviteeio-apim/distributions/graviteeio-full-4.9.7.zip -O /tmp/gravitee.zip && \
-    apt-get update && \
-    apt-get -y install unzip && \
-    unzip -q /tmp/gravitee.zip -d /opt && \
-    mv /opt/graviteeio-full-* /opt/graviteeio && \
-    rm /tmp/gravitee.zip && \
-    apt-get -y remove unzip && \
-    apt-get -y autoremove && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-
-COPY apis/gravitee/classes/ /api/classes/
-
-
-COPY apis/gravitee/database/ /api/database/
-
-# Copy OpenAPI specifications for test generation
-COPY apis/gravitee/specifications/ /api/specifications/
-
-# Copy auth.py for mitmproxy
-COPY apis/gravitee/auth.py /api/auth.py
-
-# Copy database user creation script
-COPY apis/gravitee/create-db-user.py /api/create-db-user.py
-
-# Copy gravitee-specific JaCoCo collection scripts
-COPY apis/gravitee/collect-coverage.sh /api/collect-coverage.sh
-COPY apis/gravitee/collect-coverage-interval.sh /api/collect-coverage-interval.sh
-RUN chmod +x /api/collect-coverage.sh /api/collect-coverage-interval.sh
-
+# Copy all API files (classes, database, specifications, auth, config, jar, lib)
+COPY ./apis/gravitee/ /api/
 COPY apis/infrastructure/ /infrastructure/
 
-COPY apis/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar /infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar
-COPY apis/infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar /infrastructure/jacoco/org.jacoco.cli-0.8.12-nodeps.jar
+RUN chmod +x /api/collect-coverage.sh /api/collect-coverage-interval.sh
 
 # Expose RESTgym standard ports
 # 9090: mitmproxy (reverse proxy to Gravitee)

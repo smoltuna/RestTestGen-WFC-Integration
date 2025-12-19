@@ -64,13 +64,15 @@ COPY --from=kafka-rest-base /usr/share/java/kafka-rest-lib /usr/share/java/kafka
 COPY --from=kafka-rest-base /etc/kafka-rest /etc/kafka-rest
 COPY --from=kafka-rest-base /usr/bin/kafka-rest-* /usr/bin/
 
-COPY apis/kafka-rest/specifications /api/specifications
-COPY apis/kafka-rest/start-kafka-stack.sh /usr/local/bin/start-kafka-stack.sh
-COPY apis/kafka-rest/server.properties /etc/kafka/kraft/server.properties
-COPY apis/kafka-rest/kafka-rest.properties /etc/kafka-rest/kafka-rest.properties
-COPY apis/kafka-rest/schema-registry.properties /etc/schema-registry/schema-registry.properties
+# Copy all API files (specifications, config files, scripts)
+COPY ./apis/kafka-rest/ /api/
 
-RUN chmod +x /usr/local/bin/start-kafka-stack.sh
+# Copy configurations to proper locations
+RUN cp /api/start-kafka-stack.sh /usr/local/bin/start-kafka-stack.sh && \
+    cp /api/server.properties /etc/kafka/kraft/server.properties && \
+    cp /api/kafka-rest.properties /etc/kafka-rest/kafka-rest.properties && \
+    cp /api/schema-registry.properties /etc/schema-registry/schema-registry.properties && \
+    chmod +x /usr/local/bin/start-kafka-stack.sh
 
 RUN cd /api/classes && \
     unzip -q /usr/share/java/kafka-rest-lib/kafka-rest-*.jar 'io/confluent/**/*.class' 2>/dev/null || true
@@ -83,5 +85,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
     CMD curl -f http://localhost:8082/v3/clusters || exit 1
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
-    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     /usr/local/bin/start-kafka-stack.sh

@@ -6,7 +6,6 @@ echo "=== Starting Liferay RESTgym Container ==="
 # Setup result directories
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
 mkdir -p /results/$API/$TOOL/$RUN/logs
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 
 # Configure Liferay portal-ext.properties for test user
 echo "Configuring Liferay..."

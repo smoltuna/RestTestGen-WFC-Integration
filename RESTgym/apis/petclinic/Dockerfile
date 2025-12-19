@@ -37,9 +37,6 @@ COPY apis/petclinic/classes/ /api/classes/
 # Copy database initialization files (H2 schema and data)
 COPY apis/petclinic/database/ /api/database/
 
-# Copy OpenAPI specifications for test generation
-COPY apis/petclinic/specifications/ /api/specifications/
-
 # Copy infrastructure tools from common RESTgym infrastructure
 COPY apis/infrastructure/ /infrastructure/
 

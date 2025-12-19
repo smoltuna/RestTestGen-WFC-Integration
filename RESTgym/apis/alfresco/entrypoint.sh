@@ -9,7 +9,6 @@ echo "==================================="
 # Create results directories
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
 mkdir -p /results/$API/$TOOL/$RUN/logs
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 touch /results/$API/$TOOL/$RUN/logs/postgres.log
 chown postgres:postgres /results/$API/$TOOL/$RUN/logs/postgres.log
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 mkdir -p /results/$API/$TOOL/$RUN/logs
 
 echo "Starting JaCoCo coverage collector..."

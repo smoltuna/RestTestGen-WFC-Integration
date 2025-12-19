@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 mkdir -p /data/db
 mkdir -p /results/$API/$TOOL/$RUN/logs
 
@@ -20,7 +19,7 @@ sh /infrastructure/jacoco/collect-coverage-interval.sh &
 JACOCO_PID=$!
 
 echo "Starting Gestao Hospitalar API in background..."
-java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* -Dfile.encoding=UTF-8 -Dserver.port=8080 -Dspring.data.mongodb.host=localhost -Dspring.data.mongodb.port=27017 -Dspring.data.mongodb.database=HospitalDB -jar /api/gestaohospitalar.jar > /results/$API/$TOOL/$RUN/logs/gestaohospitalar-stdout.log 2> /results/$API/$TOOL/$RUN/logs/gestaohospitalar-stderr.log &
+java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* -Dfile.encoding=UTF-8 -Dserver.port=8080 -Dspring.data.mongodb.host=localhost -Dspring.data.mongodb.port=27017 -Dspring.data.mongodb.database=HospitalDB -jar /api/gestaohospitalar-0.0.1.jar > /results/$API/$TOOL/$RUN/logs/gestaohospitalar-stdout.log 2> /results/$API/$TOOL/$RUN/logs/gestaohospitalar-stderr.log &
 API_PID=$!
 
 echo "Waiting for API to start..."

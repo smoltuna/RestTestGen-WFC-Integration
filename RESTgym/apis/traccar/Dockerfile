@@ -35,21 +35,12 @@ RUN mkdir -p /api/conf /api/logs /api/data
 # Copy RESTgym infrastructure first
 COPY apis/infrastructure/ /infrastructure/
 
-# Copy API files from apis/traccar/
-COPY apis/traccar/tracker-server.jar /api/traccar.jar
-COPY apis/traccar/lib /api/lib
-COPY apis/traccar/database /database
-COPY apis/traccar/schema /api/schema
-COPY apis/traccar/specifications /api/specifications
-COPY apis/traccar/restgym-api-config.yml /api/
-COPY apis/traccar/auth.py /api/
-COPY apis/traccar/classes /api/classes
+# Copy all API files from apis/traccar/
+COPY ./apis/traccar/ /api/
 
 # Copy traccar configuration
-RUN mkdir -p /api/database && \
-    cp /database/traccar.xml /api/conf/traccar.xml && \
-    cp /database/schema.sql /api/database/schema.sql && \
-    cp /database/data.sql /api/database/data.sql
+RUN mkdir -p /api/database /api/conf && \
+    cp /api/database/traccar.xml /api/conf/traccar.xml
 
 # Set working directory
 WORKDIR /api
@@ -63,11 +54,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
 
 # Container execution command (RESTgym template pattern)
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
-    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --set confdir=/results/$API/$TOOL/$RUN --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.traccar.*,output=tcpserver,port=12345,address=* \
-        -cp "/api/traccar.jar:/api/lib/*" \
+        -cp "/api/tracker-server.jar:/api/lib/*" \
         -Xms512m -Xmx512m \
         -Dfile.encoding=UTF-8 \
         -Djava.net.preferIPv4Stack=true \

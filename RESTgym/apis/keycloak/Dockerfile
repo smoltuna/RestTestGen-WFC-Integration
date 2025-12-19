@@ -12,13 +12,9 @@ RUN mkdir /api && \
     apt -y install openjdk-17-jdk mitmproxy python3-requests curl && \
     apt -y autoremove
 
+# Copy all Keycloak files (bin, lib, conf, classes, specifications, etc.)
 COPY ./apis/keycloak/ /api/
-
-# Copy OpenAPI specifications for test generation
-COPY apis/keycloak/specifications/ /api/specifications/
-
 COPY apis/infrastructure/ /infrastructure/
-COPY apis/keycloak/auth.py /api/
 
 ENV KC_HOME_DIR=/api
 ENV KC_CONF_DIR=/api/conf

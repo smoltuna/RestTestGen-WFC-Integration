@@ -26,6 +26,8 @@ lib/
 lib64/
 !apis/traccar/lib/
 !apis/keycloak/lib/
+!apis/keycloak/lib/lib/
+!apis/gravitee/lib/
 parts/
 sdist/
 var/

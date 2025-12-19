@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
-
 echo "Starting Quartz Manager..."
 java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=it.fabioformosa.*,output=tcpserver,port=12345,address=* \
     -Dspring.config.location=file:/api/application.properties \

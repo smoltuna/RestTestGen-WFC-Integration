@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
-cp -r /api/specifications /results/$API/$TOOL/$RUN/
 mkdir -p /data/db
 mkdir -p /results/$API/$TOOL/$RUN/logs
 mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db
@@ -16,16 +15,16 @@ sh /api/collect-coverage-interval.sh &
 JACOCO_PID=$!
 
 echo "Starting Gravitee API in background..."
-cd /opt/graviteeio/graviteeio-apim-rest-api-4.9.7
+cd /api
 java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=io.gravitee.*,output=tcpserver,port=12345,address=* \
     -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp \
-    -Dgravitee.home=/opt/graviteeio/graviteeio-apim-rest-api-4.9.7 \
+    -Dgravitee.home=/api \
     -Dgravitee.management.type=mongodb \
     -Dgravitee.management.mongodb.uri=$gravitee_management_mongodb_uri \
     -Dgravitee.ratelimit.type=mongodb \
     -Dgravitee.ratelimit.mongodb.uri=$gravitee_ratelimit_mongodb_uri \
-    -jar lib/gravitee-apim-rest-api-standalone-bootstrap-4.9.7.jar > /results/$API/$TOOL/$RUN/logs/gravitee-stdout.log 2>&1 &
+    -jar /api/lib/gravitee-apim-rest-api-standalone-bootstrap-4.9.7.jar > /results/$API/$TOOL/$RUN/logs/gravitee-stdout.log 2>&1 &
 GRAVITEE_PID=$!
 
 echo "Waiting for Gravitee to start (this may take 30-60 seconds)..."

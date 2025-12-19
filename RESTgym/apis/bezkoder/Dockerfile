@@ -22,18 +22,13 @@ RUN apt-get update && \
 
 RUN pip3 install mitmproxy
 
-COPY apis/bezkoder/spring-boot-swagger-3-example-0.0.1-SNAPSHOT.jar /api/bezkoder.jar
-
-COPY apis/bezkoder/classes/ /api/classes/
-
-COPY apis/bezkoder/specifications/ /api/specifications/
-
+# Copy all API files
+COPY ./apis/bezkoder/ /api/
 COPY apis/infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
-    cp -r /api/specifications /results/$API/$TOOL/$RUN/ && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
     mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=*,output=tcpserver,port=12345,address=* \
