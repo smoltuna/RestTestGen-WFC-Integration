@@ -21,13 +21,19 @@ RUN apt-get update && \
         gnupg \
         unzip && \
     pip3 install mitmproxy requests pymongo 'bcrypt<4.0.0' && \
-    curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg && \
+    apt-get -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy pre-downloaded MongoDB GPG key and configure repository
+COPY ./apis/gravitee/mongodb/mongodb-server-6.0.asc /tmp/mongodb-server-6.0.asc
+RUN gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg < /tmp/mongodb-server-6.0.asc && \
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
     apt-get update && \
     apt-get -y install mongodb-org && \
     apt-get -y autoremove && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/mongodb-server-6.0.asc
 
 # Copy all API files (classes, database, specifications, auth, config, jar, lib)
 COPY ./apis/gravitee/ /api/

@@ -1,0 +1,156 @@
+############################################################################################################
+################################ Gravitee.IO Management API - Configuration ################################
+############################################################################################################
+
+# HTTP Server
+http:
+  api:
+    entrypoint: /
+    management:
+      enabled: true
+      entrypoint: /management
+    portal:
+      enabled: true
+      entrypoint: /portal
+  csrf:
+    enabled: false
+  hsts:
+    enabled: false
+
+jetty:
+  host: 0.0.0.0
+  port: 8083
+  idleTimeout: 30000
+  acceptors: -1
+  selectors: -1
+  pool:
+    minThreads: 10
+    maxThreads: 200
+    idleTimeout: 60000
+    queueSize: 6000
+
+# Plugins directory
+plugins:
+  path:
+    - ${gravitee.home}/plugins
+
+# Management repository (MongoDB)
+management:
+  type: mongodb
+  mongodb:
+    dbname: gravitee
+    host: localhost
+    port: 27017
+
+# Rate limit repository
+ratelimit:
+  type: mongodb
+  mongodb:
+    dbname: gravitee
+    host: localhost
+    port: 27017
+
+# Analytics - disabled for testing
+analytics:
+  type: none
+
+# Services
+services:
+  core:
+    http:
+      enabled: true
+      port: 18083
+      host: localhost
+      authentication:
+        type: none
+  bridge:
+    http:
+      enabled: false
+  metrics:
+    enabled: false
+  v3-upgrader:
+    enabled: false
+  auto_fetch:
+    enabled: false
+  subscription:
+    enabled: false
+
+# Security and authentication
+security:
+  trustAll: true
+  providers:
+    - type: gravitee
+      password-encoding-algo: bcrypt
+    - type: memory
+      password-encoding-algo: bcrypt
+      users:
+        - user:
+            username: restapitestteam@gmail.com
+            password: $2a$10$rBcrypt.HashForUniverse1234567890
+            roles: ORGANIZATION:ADMIN,ENVIRONMENT:ADMIN
+        - user:
+            username: admin
+            password: $2a$10$Ihk05VSds5rUSgMdsMVi9OKMIx2yUvMz7y9VP3rJmQeizZLrhLMyq
+            roles: ORGANIZATION:ADMIN,ENVIRONMENT:ADMIN
+
+# JWT Configuration
+jwt:
+  secret: myJWT4Gr4v1t33_S3cr3t_F0r_R3STGym_T3st1ng
+  expire-after: 604800
+
+# Swagger/OpenAPI
+swagger:
+  scheme: https
+
+# User management
+user:
+  login:
+    defaultApplication: false
+  password:
+    policy:
+      pattern: ".*"
+
+# Email - disabled
+email:
+  enabled: false
+
+# Search data path
+search:
+  data: ${gravitee.home}/data
+
+# Notifiers - disabled
+notifiers:
+  email:
+    enabled: false
+
+# ReCaptcha - disabled
+reCaptcha:
+  enabled: false
+
+# Newsletter - disabled
+newsletter:
+  enabled: false
+
+# Integration - disabled
+integration:
+  enabled: false
+
+# Scoring - disabled
+scoring:
+  enabled: false
+
+# API configuration
+api:
+  v2:
+    emulateV4Engine:
+      default: "no"
+  properties:
+    encryption:
+      secret: vvLJ4Q8Khvv9tm2tIPdkGEdmgKUruAL6
+
+# Documentation
+documentation:
+  markdown:
+    sanitize: false
+  swagger:
+    validate-safe-content: false

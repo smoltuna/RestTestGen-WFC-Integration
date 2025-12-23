@@ -3,6 +3,11 @@ set -e
 mkdir -p /results/$API/$TOOL/$RUN/code-coverage
 mkdir -p /data/db
 mkdir -p /results/$API/$TOOL/$RUN/logs
+mkdir -p /api/plugins
+mkdir -p /api/data
+mkdir -p /api/logs
+mkdir -p /api/license
+mkdir -p /api/templates
 mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db
 echo "Waiting for MongoDB to start..."
 sleep 10

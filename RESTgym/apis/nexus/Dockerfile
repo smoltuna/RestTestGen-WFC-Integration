@@ -1,4 +1,5 @@
 FROM sonatype/nexus3:latest AS nexus-base
+# jar troppo pesante
 FROM ubuntu:22.04
 
 ENV API=nexus

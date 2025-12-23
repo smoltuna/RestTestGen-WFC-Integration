@@ -1,17 +1,21 @@
-from mitmproxy import ctx
+#!/usr/bin/env python3
+"""
+Mitmproxy addon for Cassandra Management API.
+Fixes content negotiation by converting Accept headers to text/plain.
+"""
 
-class CassandraAuth:
-    def request(self, flow):
-        # Cassandra Management API returns text/plain for many endpoints
-        # Modify Accept header to include text/plain and */*
-        original_accept = flow.request.headers.get("Accept", "")
-        
-        # If Accept is only application/json, broaden it to accept text/plain too
-        if "application/json" in original_accept and "text/plain" not in original_accept:
-            flow.request.headers["Accept"] = "text/plain, application/json, */*"
-            ctx.log.info(f"[CASSANDRA-AUTH] Modified Accept header for {flow.request.pretty_url}")
-        elif not original_accept or original_accept == "application/json":
-            flow.request.headers["Accept"] = "*/*"
-            ctx.log.info(f"[CASSANDRA-AUTH] Set Accept to */* for {flow.request.pretty_url}")
+from mitmproxy import http
 
-addons = [CassandraAuth()]
+
+class CassandraAuthMiddleware:
+    def request(self, flow: http.HTTPFlow) -> None:
+        """Modify Accept header to prevent 406 errors."""
+        # Cassandra Management API only returns text/plain
+        # Change Accept header from application/json to text/plain or */*
+        if "Accept" in flow.request.headers:
+            # If requesting JSON, change to accept text/plain
+            if "application/json" in flow.request.headers["Accept"]:
+                flow.request.headers["Accept"] = "text/plain, */*"
+
+
+addons = [CassandraAuthMiddleware()]
