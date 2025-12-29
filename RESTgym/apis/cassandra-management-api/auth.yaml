@@ -1,0 +1,6 @@
+# WFC Auth configuration for Cassandra Management API
+# Authentication: NONE - API has no authentication
+# This file exists to maintain consistency with other APIs
+# The custom auth.py handles content negotiation (Accept header fix) only
+
+# No auth required - Cassandra Management API is open

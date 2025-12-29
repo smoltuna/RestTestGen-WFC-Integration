@@ -48,7 +48,7 @@ USER root
 # Dipendenze
 RUN apt-get update && \
     apt-get install -y python3 python3-pip unzip wget && \
-    pip3 install mitmproxy && \
+    pip3 install mitmproxy pyyaml requests && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -58,31 +58,17 @@ RUN mkdir -p /infrastructure /results /api/classes /api/specifications
 # Copia infrastructure come negli altri Dockerfile RESTgym
 COPY apis/infrastructure/ /infrastructure/
 
-# Copia le specifiche OpenAPI
+# Copy API files
 COPY apis/liferay/specifications/ /api/specifications/
+COPY apis/liferay/auth.yaml /api/auth.yaml
+COPY apis/liferay/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Copia le classi estratte
+# Copy the classes extracted from the extractor stage
 COPY --from=extractor --chown=liferay:liferay /extracted/classes /api/classes/
 
-# Script JaCoCo
-RUN mkdir -p /opt/liferay/tomcat/bin && \
-    echo '#!/bin/bash' > /opt/liferay/tomcat/bin/setenv-jacoco.sh && \
-    echo 'export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=com.liferay.*,output=tcpserver,port=12345,address=*"' >> /opt/liferay/tomcat/bin/setenv-jacoco.sh && \
-    chmod +x /opt/liferay/tomcat/bin/setenv-jacoco.sh && \
-    chown liferay:liferay /opt/liferay/tomcat/bin/setenv-jacoco.sh
+EXPOSE 9090 12345 8080
 
-# Script di avvio personalizzato
-RUN echo '#!/bin/bash' > /startup.sh && \
-    echo 'source /opt/liferay/tomcat/bin/setenv-jacoco.sh 2>/dev/null || true' >> /startup.sh && \
-    echo 'mkdir -p /results/$API/$TOOL/$RUN/code-coverage' >> /startup.sh && \
-    echo 'cp -r /api/specifications /results/$API/$TOOL/$RUN/' >> /startup.sh && \
-    echo 'sh /infrastructure/jacoco/collect-coverage-interval.sh &' >> /startup.sh && \
-    echo 'mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py &' >> /startup.sh && \
-    echo 'exec /opt/liferay/tomcat/bin/catalina.sh run' >> /startup.sh && \
-    chmod +x /startup.sh && \
-    chown liferay:liferay /startup.sh
-
-EXPOSE 9090 12345
-
-USER liferay
-CMD ["/bin/bash", "/startup.sh"]
+# Override both ENTRYPOINT and CMD to use our entrypoint.sh directly
+ENTRYPOINT []
+CMD ["/bin/bash", "/entrypoint.sh"]

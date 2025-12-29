@@ -1,0 +1,10 @@
+# WFC Auth configuration for Alfresco Content Services
+# Authentication: Basic Auth with pre-created user
+# User restapitestteam is created at startup via entrypoint.sh using admin credentials
+
+auth:
+  - name: admin
+    fixedHeaders:
+      - name: Authorization
+        # Base64 of "restapitestteam:universe"
+        value: Basic cmVzdGFwaXRlc3R0ZWFtOnVuaXZlcnNl

@@ -22,8 +22,8 @@ RUN dnf install -y \
         postgresql-contrib && \
     dnf clean all
 
-# Install mitmproxy and requests
-RUN pip3 install mitmproxy requests
+# Install mitmproxy, requests, and pyyaml for WFC auth
+RUN pip3 install mitmproxy requests pyyaml
 
 # Initialize PostgreSQL data directory
 RUN mkdir -p /var/lib/pgsql/data && \

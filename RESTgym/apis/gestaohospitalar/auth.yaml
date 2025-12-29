@@ -1,0 +1,8 @@
+# WFC Auth configuration for Sistema de Gestão Hospitalar
+# Authentication: Session-based - registration returns session cookie directly
+# Note: This API returns JSESSIONID cookie on registration, no separate login needed
+# The auth.py handles the custom session flow since WFC doesn't support this pattern
+
+# No standard WFC auth - API uses custom session handling via auth.py
+# Registration endpoint: POST /register returns JSESSIONID cookie
+# Cookie is then sent with all subsequent requests
