@@ -1,0 +1,8 @@
+# WFC Auth configuration for Nexus Repository Manager
+# Authentication: Basic Auth with admin credentials
+
+auth:
+  - name: admin
+    fixedHeaders:
+      - name: Authorization
+        value: Basic YWRtaW46YWRtaW4xMjM=

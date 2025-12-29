@@ -1,0 +1,26 @@
+# WFC Auth configuration for RealWorld Micronaut Backend
+# Authentication: JWT Token via login endpoint
+# Note: User must be registered first via POST /api/users
+
+auth:
+  - name: user
+    loginEndpointAuth:
+      payloadRaw: '{"user": {"email": "restapitestteam@gmail.com", "password": "universe"}}'
+    # Extension: signupEndpoint for user registration before login
+    signupEndpoint:
+      endpoint: /api/users
+      verb: POST
+      contentType: application/json
+      payloadRaw: '{"user": {"username": "restapitestteam", "email": "restapitestteam@gmail.com", "password": "universe"}}'
+
+authTemplate:
+  loginEndpointAuth:
+    endpoint: /api/users/login
+    verb: POST
+    contentType: application/json
+    token:
+      extractFrom: body
+      extractSelector: /user/token
+      sendIn: header
+      sendName: Authorization
+      sendTemplate: "Token {token}"

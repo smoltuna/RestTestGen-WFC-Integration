@@ -1,0 +1,8 @@
+# WFC Auth configuration for Gravitee.io Portal REST API
+# Authentication: Basic Auth
+
+auth:
+  - name: admin
+    fixedHeaders:
+      - name: Authorization
+        value: Basic cmVzdGFwaXRlc3R0ZWFtQGdtYWlsLmNvbTp1bml2ZXJzZQ==

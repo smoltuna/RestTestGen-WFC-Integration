@@ -31,7 +31,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install mitmproxy
+RUN pip3 install mitmproxy pyyaml requests
 
 
 COPY ./apis/nexus/ /api/
@@ -61,6 +61,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
 
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     sh /api/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8081/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
+    mitmdump -p 9090 --mode reverse:http://localhost:8081/ -s /infrastructure/mitmproxy/store-interactions.py -s /infrastructure/mitmproxy/wfc-auth.py & \
     export INSTALL4J_ADD_VM_PARAMS="-javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.12-runtime.jar=includes=org.sonatype.*:com.sonatype.*,output=tcpserver,port=12345,address=* -Xms${JAVA_MIN_MEM} -Xmx${JAVA_MAX_MEM}" && \
     /opt/sonatype/nexus/bin/nexus run 2>&1 | tee /results/$API/$TOOL/$RUN/nexus.log

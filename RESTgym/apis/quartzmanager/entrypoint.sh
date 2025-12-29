@@ -26,7 +26,7 @@ sh /infrastructure/jacoco/collect-coverage-interval.sh &
 echo "Starting mitmproxy..."
 mitmdump -p 9090 --mode reverse:http://localhost:8080/ \
     -s /infrastructure/mitmproxy/store-interactions.py \
-    -s /api/auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
+    -s /infrastructure/mitmproxy/wfc-auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
 
 echo "Waiting for mitmproxy..."
 sleep 10

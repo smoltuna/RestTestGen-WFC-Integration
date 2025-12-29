@@ -9,7 +9,7 @@ RUN mkdir /api && \
     mkdir /results && \
     apt update && \
     apt -y upgrade && \
-    apt -y install openjdk-17-jdk mitmproxy python3-requests curl && \
+    apt -y install openjdk-17-jdk mitmproxy python3-requests python3-yaml curl && \
     apt -y autoremove
 
 # Copy all Keycloak files (bin, lib, conf, classes, specifications, etc.)

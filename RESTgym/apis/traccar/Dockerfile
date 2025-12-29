@@ -26,8 +26,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install mitmproxy
-RUN pip3 install mitmproxy
+# Install mitmproxy and pyyaml for WFC auth
+RUN pip3 install mitmproxy pyyaml requests
 
 # Create API directories
 RUN mkdir -p /api/conf /api/logs /api/data
@@ -55,7 +55,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
 # Container execution command (RESTgym template pattern)
 CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
     sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --set confdir=/results/$API/$TOOL/$RUN --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py & \
+    mitmdump -p 9090 --set confdir=/results/$API/$TOOL/$RUN --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /infrastructure/mitmproxy/wfc-auth.py & \
     java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.traccar.*,output=tcpserver,port=12345,address=* \
         -cp "/api/tracker-server.jar:/api/lib/*" \
         -Xms512m -Xmx512m \
