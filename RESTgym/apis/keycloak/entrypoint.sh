@@ -29,6 +29,39 @@ for i in {1..90}; do
   sleep 1
 done
 
+# Get admin token
+echo "Getting admin token..."
+ADMIN_TOKEN=$(curl -s -X POST "http://localhost:8080/realms/master/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=admin-cli&username=admin&password=admin" | python3 -c "import sys, json; print(json.load(sys.stdin)['access_token'])")
+
+# Create user restapitestteam@gmail.com
+echo "Creating user restapitestteam@gmail.com..."
+curl -s -X POST "http://localhost:8080/admin/realms/master/users" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "restapitestteam@gmail.com",
+    "email": "restapitestteam@gmail.com",
+    "enabled": true,
+    "credentials": [{"type": "password", "value": "universe", "temporary": false}]
+  }' && echo "User created" || echo "User may already exist"
+
+# Get user ID
+USER_ID=$(curl -s "http://localhost:8080/admin/realms/master/users?username=restapitestteam@gmail.com" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" | python3 -c "import sys, json; users=json.load(sys.stdin); print(users[0]['id'] if users else '')")
+
+# Assign admin role to the user
+if [ -n "$USER_ID" ]; then
+  echo "Assigning admin role to user..."
+  ADMIN_ROLE=$(curl -s "http://localhost:8080/admin/realms/master/roles/admin" \
+    -H "Authorization: Bearer $ADMIN_TOKEN")
+  curl -s -X POST "http://localhost:8080/admin/realms/master/users/$USER_ID/role-mappings/realm" \
+    -H "Authorization: Bearer $ADMIN_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "[$ADMIN_ROLE]" && echo "Role assigned" || echo "Role assignment failed"
+fi
+
 echo "Starting mitmproxy..."
 mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /infrastructure/mitmproxy/wfc-auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
 MITM_PID=$!

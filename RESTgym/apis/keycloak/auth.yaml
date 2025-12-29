@@ -4,7 +4,7 @@
 auth:
   - name: admin
     loginEndpointAuth:
-      payloadRaw: "grant_type=password&client_id=admin-cli&username=admin&password=admin"
+      payloadRaw: "grant_type=password&client_id=admin-cli&username=restapitestteam@gmail.com&password=universe"
 
 authTemplate:
   loginEndpointAuth:

@@ -5,4 +5,4 @@ auth:
   - name: admin
     fixedHeaders:
       - name: Authorization
-        value: Basic cmVzdGFwaXRlc3R0ZWFtQGdtYWlsLmNvbTpyZXN0YXBpdGVzdHRlYW0=
+        value: Basic cmVzdGFwaXRlc3R0ZWFtQGdtYWlsLmNvbTp1bml2ZXJzZQ==

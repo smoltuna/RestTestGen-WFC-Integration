@@ -23,12 +23,6 @@ COPY apis/infrastructure/ /infrastructure/
 
 EXPOSE 9090 12345 8080
 
+RUN chmod +x /api/entrypoint.sh
 
-CMD mkdir -p /results/$API/$TOOL/$RUN/code-coverage && \
-    sh /infrastructure/jacoco/collect-coverage-interval.sh & \
-    mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /infrastructure/mitmproxy/wfc-auth.py & \
-    java -javaagent:/infrastructure/jacoco/org.jacoco.agent-0.8.7-runtime.jar=includes=org.flowable.*,output=tcpserver,port=12345,address=* \
-        -Dfile.encoding=UTF-8 \
-        -Dserver.port=8080 \
-        -Dspring.config.location=file:/api/application.properties \
-        -jar /api/flowable-rest.war
+CMD ["/api/entrypoint.sh"]
