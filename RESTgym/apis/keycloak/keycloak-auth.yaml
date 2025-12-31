@@ -5,6 +5,7 @@ auth:
       payloadRaw: "grant_type=password&client_id=admin-cli&username=restapitestteam@gmail.com&password=universe"
 
 authTemplate:
+  baseUrl: http://localhost:8080
   loginEndpointAuth:
     endpoint: /realms/master/protocol/openid-connect/token
     verb: POST

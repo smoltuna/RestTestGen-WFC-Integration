@@ -1,0 +1,15 @@
+# Example API Configuration for RestTestGen + WFC Auth
+# This file demonstrates how to configure an API with WFC authentication.
+
+name: Example API
+
+specificationFileName: openapi.json
+# Override server URL from OpenAPI spec
+host: "http://localhost:9090"
+
+# Authentication commands - RestTestGen executes these and expects JSON output
+authenticationCommands:
+  default: "python3 /scripts/wfc-auth.py /auth/example-api-auth.yaml"
+  
+  # For simple static tokens
+  # default: 'echo {"name": "Authorization", "value": "Bearer test-token", "in": "header", "duration": 3600}'

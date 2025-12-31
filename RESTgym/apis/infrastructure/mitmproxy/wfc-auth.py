@@ -19,7 +19,6 @@ class WFCAuth:
         self.auth_users = []
         self.current_user_index = 0
         self.tokens = {}  # Cache tokens per user
-        self.cookies = {}  # Cache cookies per user
         self.base_url = "http://localhost:8080"
         self.initialized = False
         self.signup_done = {}  # Track signup per user
@@ -45,6 +44,11 @@ class WFCAuth:
             
             # Apply authTemplate to all auth entries
             template = self.auth_config.get('authTemplate', {})
+            
+            # Get baseUrl from authTemplate or use default
+            self.base_url = template.get('baseUrl', 'http://localhost:8080')
+            print(f"[WFC-AUTH] Using base URL: {self.base_url}", file=sys.stderr)
+            
             self.auth_users = []
             
             for user in self.auth_config['auth']:
@@ -89,7 +93,7 @@ class WFCAuth:
         return self.auth_users[0]  # Use first user for simplicity
     
     def _extract_token_from_json(self, json_data, json_pointer):
-        """Extract value from JSON using JSON Pointer (RFC 6901)"""
+        """Extract value from JSON using JSON Pointer"""
         if not json_pointer:
             return None
         
@@ -218,10 +222,10 @@ class WFCAuth:
                 print(f"[WFC-AUTH] Login failed: {response.text[:200]}", file=sys.stderr)
                 return None
             
-            # Handle token extraction (EvoMaster schema)
+            # Handle token extraction ()
             token_config = login_config.get('token')
             if token_config:
-                # EvoMaster uses extractFromField (JSON pointer)
+                # uses extractFromField (JSON pointer)
                 extract_from_field = token_config.get('extractFromField')
                 
                 if extract_from_field:
@@ -229,9 +233,22 @@ class WFCAuth:
                         json_response = response.json()
                         token = self._extract_token_from_json(json_response, extract_from_field)
                         if token:
+                            # Extract duration: expires_in (seconds), expiresIn (seconds), or exp (unix timestamp)
+                            duration = None
+                            for field in ['expires_in', 'expiresIn']:
+                                if field in json_response and isinstance(json_response[field], (int, float)):
+                                    duration = int(json_response[field])
+                                    break
+                            if duration is None and 'exp' in json_response:
+                                import time
+                                exp_value = json_response.get('exp')
+                                if isinstance(exp_value, (int, float)):
+                                    duration = max(0, int(exp_value) - int(time.time()))
+                            
                             self.tokens[user_name] = {
                                 'token': token,
-                                'config': token_config
+                                'config': token_config,
+                                'duration': duration
                             }
                             print(f"[WFC-AUTH] Extracted token for {user_name}", file=sys.stderr)
                             return token
@@ -239,11 +256,6 @@ class WFCAuth:
                             print(f"[WFC-AUTH] Failed to extract token using {extract_from_field}", file=sys.stderr)
                     except json.JSONDecodeError:
                         print(f"[WFC-AUTH] Failed to parse JSON response", file=sys.stderr)
-            
-            # Handle cookies (EvoMaster schema)
-            if login_config.get('expectCookies') and response.cookies:
-                self.cookies[user_name] = dict(response.cookies)
-                print(f"[WFC-AUTH] Stored cookies for {user_name}", file=sys.stderr)
             
             return None
             
@@ -269,7 +281,7 @@ class WFCAuth:
             token = token_data['token']
             token_config = token_data['config']
             
-            # EvoMaster schema: httpHeaderName and headerPrefix
+            # : httpHeaderName and headerPrefix
             header_name = token_config.get('httpHeaderName', 'Authorization')
             header_prefix = token_config.get('headerPrefix', '')
             
@@ -290,7 +302,7 @@ class WFCAuth:
                 token = token_data['token']
                 token_config = token_data['config']
                 
-                # EvoMaster schema: httpHeaderName and headerPrefix
+                # : httpHeaderName and headerPrefix
                 header_name = token_config.get('httpHeaderName', 'Authorization')
                 header_prefix = token_config.get('headerPrefix', '')
                 

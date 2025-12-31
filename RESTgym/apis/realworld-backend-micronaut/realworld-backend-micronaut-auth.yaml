@@ -11,6 +11,7 @@ auth:
       payloadRaw: '{"user": {"username": "restapitestteam", "email": "restapitestteam@gmail.com", "password": "universe"}}'
 
 authTemplate:
+  baseUrl: http://localhost:8080
   loginEndpointAuth:
     endpoint: /api/users/login
     verb: POST

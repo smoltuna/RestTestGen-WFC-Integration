@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 WFC auth script for RestTestGen. Reads auth.yaml and outputs JSON.
-Usage: python3 wfc-auth.py /path/to/auth.yaml [base_url]
+Usage: python3 wfc-auth.py /path/to/auth.yaml
 """
 
 import sys
@@ -10,8 +10,9 @@ import json
 import yaml
 import requests
 from urllib.parse import urljoin
+import time
 
-# Default token duration in seconds (1 hour)
+# Default token duration
 DEFAULT_DURATION = 3600
 
 # Suppress SSL warnings for development environments
@@ -61,7 +62,7 @@ def merge_with_template(user, template):
 
 
 def extract_token_from_json(json_data, json_pointer):
-    """Extract value from JSON using JSON Pointer (RFC 6901)"""
+    """Extract value from JSON using JSON Pointer"""
     if not json_pointer:
         return None
     
@@ -111,7 +112,7 @@ def perform_signup(base_url, user):
 
 
 def perform_login(base_url, user):
-    """Perform login and extract token/cookies based on EvoMaster WFC config"""
+    """Perform login and extract token/cookies based on WFC config"""
     login_config = user.get('loginEndpointAuth')
     
     if not login_config:
@@ -165,10 +166,10 @@ def perform_login(base_url, user):
             print(f"Login failed: {response.text[:500]}", file=sys.stderr)
             return None
         
-        # Handle token extraction (EvoMaster schema)
+        # Handle token extraction ()
         token_config = login_config.get('token')
         if token_config:
-            # EvoMaster uses extractFromField (JSON pointer, implies body)
+            # uses extractFromField (JSON pointer, implies body)
             extract_from_field = token_config.get('extractFromField')
             
             if extract_from_field:
@@ -176,21 +177,26 @@ def perform_login(base_url, user):
                     json_response = response.json()
                     token = extract_token_from_json(json_response, extract_from_field)
                     if token:
+                        # Extract duration: expires_in (seconds), expiresIn (seconds), or exp (unix timestamp)
+                        duration = None
+                        for field in ['expires_in', 'expiresIn']:
+                            if field in json_response and isinstance(json_response[field], (int, float)):
+                                duration = int(json_response[field])
+                                break
+                        if duration is None and 'exp' in json_response:
+                            exp_value = json_response.get('exp')
+                            if isinstance(exp_value, (int, float)):
+                                duration = max(0, int(exp_value) - int(time.time()))
+                        
                         return {
                             'token': token,
-                            'config': token_config
+                            'config': token_config,
+                            'duration': duration
                         }
                     else:
                         print(f"Failed to extract token using {extract_from_field}", file=sys.stderr)
                 except json.JSONDecodeError:
                     print("Failed to parse JSON response", file=sys.stderr)
-        
-        # Handle cookie extraction (EvoMaster schema)
-        if login_config.get('expectCookies') and response.cookies:
-            return {
-                'cookies': dict(response.cookies),
-                'config': login_config
-            }
         
         return None
         
@@ -224,20 +230,23 @@ def get_auth_info(base_url, user):
         print("Authentication failed", file=sys.stderr)
         return None
     
-    # Token-based auth (EvoMaster schema)
+    # Token-based auth ()
     if 'token' in login_result:
         token = login_result['token']
         token_config = login_result['config']
         
-        # EvoMaster schema: httpHeaderName and headerPrefix
+        # : httpHeaderName and headerPrefix
         header_name = token_config.get('httpHeaderName', 'Authorization')
         header_prefix = token_config.get('headerPrefix', '')
+        
+        # Use duration from response if available, otherwise use default
+        duration = login_result.get('duration') or DEFAULT_DURATION
         
         return {
             "name": header_name,
             "value": f"{header_prefix}{token}",
             "in": "header",
-            "duration": DEFAULT_DURATION
+            "duration": duration
         }
     
     # Cookie-based auth
@@ -257,17 +266,17 @@ def get_auth_info(base_url, user):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 wfc-auth.py /path/to/auth.yaml [base_url]", file=sys.stderr)
+        print("Usage: python3 wfc-auth.py /path/to/auth.yaml", file=sys.stderr)
         sys.exit(1)
     
     auth_yaml_path = sys.argv[1]
-    base_url = sys.argv[2] if len(sys.argv) > 2 else "http://localhost:9090"
     
     # Load configuration
     config = load_auth_config(auth_yaml_path)
     
-    # Get template and merge with first user
+    # Get base_url from authTemplate or use default
     template = config.get('authTemplate', {})
+    base_url = template.get('baseUrl', 'http://localhost:9090')
     users = config.get('auth', [])
     
     if not users:
