@@ -1,0 +1,21 @@
+# JWT with signup
+auth:
+  - name: user
+    loginEndpointAuth:
+      payloadRaw: '{"user": {"email": "restapitestteam@gmail.com", "password": "universe"}}'
+    # Extension: signupEndpoint for user registration before login
+    signupEndpoint:
+      endpoint: /api/users
+      verb: POST
+      contentType: application/json
+      payloadRaw: '{"user": {"username": "restapitestteam", "email": "restapitestteam@gmail.com", "password": "universe"}}'
+
+authTemplate:
+  loginEndpointAuth:
+    endpoint: /api/users/login
+    verb: POST
+    contentType: application/json
+    token:
+      extractFromField: /user/token
+      httpHeaderName: Authorization
+      headerPrefix: "Token "

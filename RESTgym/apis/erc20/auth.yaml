@@ -1,7 +1,0 @@
-# WFC Auth configuration for ERC20 REST Service
-# Authentication: NONE - API is public
-# This API uses Ethereum contract addresses instead of user authentication
-# Contract address is deployed at startup via init-contract.py
-# Requests are rewritten by auth.py to use the deployed contract address
-
-# No authentication required - ERC20 is a public blockchain API

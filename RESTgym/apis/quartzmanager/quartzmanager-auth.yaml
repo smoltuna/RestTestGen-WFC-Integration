@@ -1,0 +1,15 @@
+# JWT via login endpoint
+auth:
+  - name: admin
+    loginEndpointAuth:
+      payloadRaw: "username=restapitestteam@gmail.com&password=universe"
+
+authTemplate:
+  loginEndpointAuth:
+    endpoint: /quartz-manager/auth/login
+    verb: POST
+    contentType: application/x-www-form-urlencoded
+    token:
+      extractFromField: /accessToken
+      httpHeaderName: Authorization
+      headerPrefix: "Bearer "

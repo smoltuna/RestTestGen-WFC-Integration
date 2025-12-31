@@ -1,9 +1,0 @@
-# WFC Auth configuration for Nexus Repository Manager
-# Authentication: Basic Auth with restapitestteam user
-# Note: Nexus uses userId (not email) for authentication
-
-auth:
-  - name: admin
-    fixedHeaders:
-      - name: Authorization
-        value: Basic cmVzdGFwaXRlc3R0ZWFtOnVuaXZlcnNl

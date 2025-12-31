@@ -1,8 +1,0 @@
-# WFC Auth configuration for Flowable Process API
-# Authentication: Basic Auth
-
-auth:
-  - name: admin
-    fixedHeaders:
-      - name: Authorization
-        value: Basic cmVzdGFwaXRlc3R0ZWFtQGdtYWlsLmNvbTp1bml2ZXJzZQ==

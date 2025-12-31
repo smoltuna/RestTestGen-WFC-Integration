@@ -1,8 +1,5 @@
 """
-WFC (Web Fuzzing Commons) Authentication Handler for mitmproxy
-This script reads auth.yaml files and applies authentication according to the WFC schema.
-Supports: fixedHeaders, loginEndpointAuth with token extraction, and cookie-based auth.
-Extension: signupEndpoint for APIs requiring user registration before login.
+WFC auth handler for mitmproxy.
 """
 import os
 import sys
@@ -11,13 +8,10 @@ import requests
 import yaml
 from mitmproxy import http, ctx
 from urllib.parse import urljoin
-from functools import reduce
+
 
 class WFCAuth:
-    """
-    WFC-compatible authentication handler for mitmproxy.
-    Reads auth.yaml and applies authentication to intercepted requests.
-    """
+    """Reads auth.yaml and applies auth headers to intercepted requests."""
     
     def __init__(self):
         self.api_name = os.environ.get('API', 'unknown')
@@ -224,36 +218,32 @@ class WFCAuth:
                 print(f"[WFC-AUTH] Login failed: {response.text[:200]}", file=sys.stderr)
                 return None
             
-            # Handle cookies
-            if login_config.get('expectCookies'):
-                self.cookies[user_name] = dict(response.cookies)
-                print(f"[WFC-AUTH] Stored cookies for {user_name}", file=sys.stderr)
-            
-            # Handle token extraction
+            # Handle token extraction (EvoMaster schema)
             token_config = login_config.get('token')
             if token_config:
-                extract_from = token_config.get('extractFrom', 'body')
-                extract_selector = token_config.get('extractSelector', '')
+                # EvoMaster uses extractFromField (JSON pointer)
+                extract_from_field = token_config.get('extractFromField')
                 
-                token = None
-                if extract_from == 'body':
+                if extract_from_field:
                     try:
                         json_response = response.json()
-                        token = self._extract_token_from_json(json_response, extract_selector)
+                        token = self._extract_token_from_json(json_response, extract_from_field)
+                        if token:
+                            self.tokens[user_name] = {
+                                'token': token,
+                                'config': token_config
+                            }
+                            print(f"[WFC-AUTH] Extracted token for {user_name}", file=sys.stderr)
+                            return token
+                        else:
+                            print(f"[WFC-AUTH] Failed to extract token using {extract_from_field}", file=sys.stderr)
                     except json.JSONDecodeError:
                         print(f"[WFC-AUTH] Failed to parse JSON response", file=sys.stderr)
-                elif extract_from == 'header':
-                    token = response.headers.get(extract_selector)
-                
-                if token:
-                    self.tokens[user_name] = {
-                        'token': token,
-                        'config': token_config
-                    }
-                    print(f"[WFC-AUTH] Extracted token for {user_name}", file=sys.stderr)
-                    return token
-                else:
-                    print(f"[WFC-AUTH] Failed to extract token from {extract_from} using {extract_selector}", file=sys.stderr)
+            
+            # Handle cookies (EvoMaster schema)
+            if login_config.get('expectCookies') and response.cookies:
+                self.cookies[user_name] = dict(response.cookies)
+                print(f"[WFC-AUTH] Stored cookies for {user_name}", file=sys.stderr)
             
             return None
             
@@ -279,13 +269,11 @@ class WFCAuth:
             token = token_data['token']
             token_config = token_data['config']
             
-            send_in = token_config.get('sendIn', 'header')
-            send_name = token_config.get('sendName', 'Authorization')
-            send_template = token_config.get('sendTemplate', '{token}')
+            # EvoMaster schema: httpHeaderName and headerPrefix
+            header_name = token_config.get('httpHeaderName', 'Authorization')
+            header_prefix = token_config.get('headerPrefix', '')
             
-            if send_in == 'header':
-                headers[send_name] = send_template.replace('{token}', token)
-            
+            headers[header_name] = f"{header_prefix}{token}"
             return headers
         
         # Need to perform login (with signup first if configured)
@@ -302,12 +290,11 @@ class WFCAuth:
                 token = token_data['token']
                 token_config = token_data['config']
                 
-                send_in = token_config.get('sendIn', 'header')
-                send_name = token_config.get('sendName', 'Authorization')
-                send_template = token_config.get('sendTemplate', '{token}')
+                # EvoMaster schema: httpHeaderName and headerPrefix
+                header_name = token_config.get('httpHeaderName', 'Authorization')
+                header_prefix = token_config.get('headerPrefix', '')
                 
-                if send_in == 'header':
-                    headers[send_name] = send_template.replace('{token}', token)
+                headers[header_name] = f"{header_prefix}{token}"
         
         return headers
     

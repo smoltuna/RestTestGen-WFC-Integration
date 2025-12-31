@@ -1,0 +1,6 @@
+# Basic Auth (uses userId, not email)
+auth:
+  - name: admin
+    fixedHeaders:
+      - name: Authorization
+        value: Basic cmVzdGFwaXRlc3R0ZWFtOnVuaXZlcnNl

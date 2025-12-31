@@ -1,8 +1,0 @@
-# WFC Auth configuration for Traccar GPS Tracking System
-# Authentication: Basic Auth with pre-configured admin user
-
-auth:
-  - name: admin
-    fixedHeaders:
-      - name: Authorization
-        value: Basic cmVzdGFwaXRlc3R0ZWFtQGdtYWlsLmNvbTp1bml2ZXJzZQ==

@@ -1,35 +1,85 @@
-FROM restgym/resttestgen-tool:1.0.0
+# RestTestGen Dockerfile
+# Build from RESTgym/: docker build -f tools/resttestgen/Dockerfile -t resttestgen .
 
-# Copy API specifications into the tool image
+# Stage 1: Build Java with Gradle
+FROM gradle:8.14-jdk17 AS builder
 
-COPY apis/alfresco/specifications/* /specifications/
-COPY apis/bezkoder/specifications/* /specifications/
-COPY apis/blog/specifications/* /specifications/
-COPY apis/cassandra-management-api/specifications/* /specifications/
-COPY apis/erc20/specifications/* /specifications/
-COPY apis/features-service/specifications/* /specifications/
-COPY apis/flightsearchapi/specifications/* /specifications/
-COPY apis/flowable-process/specifications/* /specifications/
-COPY apis/genome-nexus/specifications/* /specifications/
-COPY apis/gestaohospitalar/specifications/* /specifications/
-COPY apis/gravitee/specifications/* /specifications/
-COPY apis/kafka-rest/specifications/* /specifications/
-COPY apis/keycloak/specifications/* /specifications/
-COPY apis/languagetool/specifications/* /specifications/
-#COPY apis/liferay/specifications/* /specifications/
-COPY apis/market/specifications/* /specifications/
-COPY apis/microcks/specifications/* /specifications/
-COPY apis/ncs/specifications/* /specifications/
-COPY apis/nexus/specifications/* /specifications/
-COPY apis/notebookmanager/specifications/* /specifications/
-COPY apis/person-controller/specifications/* /specifications/
-COPY apis/petclinic/specifications/* /specifications/
-COPY apis/project-tracking-system/specifications/* /specifications/
-COPY apis/quartzmanager/specifications/* /specifications/
-COPY apis/realworld-backend-micronaut/specifications/* /specifications/
-COPY apis/restcountries/specifications/* /specifications/
-COPY apis/scs/specifications/* /specifications/
-COPY apis/spring-kafka-producer/specifications/* /specifications/
-COPY apis/spring-kafka-publisher/specifications/* /specifications/
-COPY apis/traccar/specifications/* /specifications/
-COPY apis/user-management/specifications/* /specifications/
+WORKDIR /app
+
+COPY tools/resttestgen/build.gradle* ./
+COPY tools/resttestgen/src/ ./src/
+
+RUN gradle clean build -x test
+
+# Stage 2: Runtime (Eclipse Temurin 17 JRE with Python for auth scripts)
+FROM eclipse-temurin:17-jre-jammy AS runtime
+
+# Install Python and dependencies for WFC auth scripts
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-yaml \
+    python3-requests \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy built JAR from build stage
+COPY --from=builder /app/build/libs/*-all.jar ./rtg.jar
+
+# Copy WFC auth script to a global location
+COPY tools/resttestgen/scripts/wfc-auth.py /scripts/wfc-auth.py
+RUN chmod +x /scripts/wfc-auth.py
+
+# Create directory for WFC auth configurations
+RUN mkdir -p /auth /specifications
+
+# Copy WFC auth configuration files (for APIs that require authentication)
+COPY apis/alfresco/alfresco-auth.yaml /auth/
+COPY apis/flowable-process/flowable-process-auth.yaml /auth/
+COPY apis/gravitee/gravitee-auth.yaml /auth/
+COPY apis/keycloak/keycloak-auth.yaml /auth/
+COPY apis/liferay/liferay-auth.yaml /auth/
+COPY apis/nexus/nexus-auth.yaml /auth/
+COPY apis/quartzmanager/quartzmanager-auth.yaml /auth/
+COPY apis/realworld-backend-micronaut/realworld-backend-micronaut-auth.yaml /auth/
+COPY apis/traccar/traccar-auth.yaml /auth/
+
+# Copy all OpenAPI specifications to /specifications (flat structure like old image)
+COPY apis/alfresco/specifications/*-openapi.json /specifications/
+COPY apis/bezkoder/specifications/*-openapi.json /specifications/
+COPY apis/blog/specifications/*-openapi.json /specifications/
+COPY apis/cassandra-management-api/specifications/*-openapi.json /specifications/
+COPY apis/erc20/specifications/*-openapi.json /specifications/
+COPY apis/features-service/specifications/*-openapi.json /specifications/
+COPY apis/flightsearchapi/specifications/*-openapi.json /specifications/
+COPY apis/flowable-process/specifications/*-openapi.json /specifications/
+COPY apis/genome-nexus/specifications/*-openapi.json /specifications/
+COPY apis/gestaohospitalar/specifications/*-openapi.json /specifications/
+COPY apis/gravitee/specifications/*-openapi.json /specifications/
+COPY apis/kafka-rest/specifications/*-openapi.json /specifications/
+COPY apis/keycloak/specifications/*-openapi.json /specifications/
+COPY apis/languagetool/specifications/*-openapi.json /specifications/
+COPY apis/liferay/specifications/*-openapi.json /specifications/
+COPY apis/market/specifications/*-openapi.json /specifications/
+COPY apis/microcks/specifications/*-openapi.json /specifications/
+COPY apis/ncs/specifications/*-openapi.json /specifications/
+COPY apis/nexus/specifications/*-openapi.json /specifications/
+COPY apis/notebookmanager/specifications/*-openapi.json /specifications/
+COPY apis/person-controller/specifications/*-openapi.json /specifications/
+COPY apis/petclinic/specifications/*-openapi.json /specifications/
+COPY apis/project-tracking-system/specifications/*-openapi.json /specifications/
+COPY apis/quartzmanager/specifications/*-openapi.json /specifications/
+COPY apis/realworld-backend-micronaut/specifications/*-openapi.json /specifications/
+COPY apis/restcountries/specifications/*-openapi.json /specifications/
+COPY apis/scs/specifications/*-openapi.json /specifications/
+COPY apis/spring-kafka-producer/specifications/*-openapi.json /specifications/
+COPY apis/spring-kafka-publisher/specifications/*-openapi.json /specifications/
+COPY apis/traccar/specifications/*-openapi.json /specifications/
+COPY apis/user-management/specifications/*-openapi.json /specifications/
+
+# Copy config script (generates api-config.yml at runtime using env vars)
+COPY tools/resttestgen/config.sh /app/config.sh
+RUN chmod +x /app/config.sh
+
+CMD ["sh", "-c", "sh /app/config.sh && while true; do java -jar rtg.jar; done"]

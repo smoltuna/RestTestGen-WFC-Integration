@@ -63,7 +63,7 @@ if [ -n "$USER_ID" ]; then
 fi
 
 echo "Starting mitmproxy..."
-mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /infrastructure/mitmproxy/wfc-auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
+mitmdump -p 9090 --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
 MITM_PID=$!
 
 echo "Waiting for mitmproxy to start..."
