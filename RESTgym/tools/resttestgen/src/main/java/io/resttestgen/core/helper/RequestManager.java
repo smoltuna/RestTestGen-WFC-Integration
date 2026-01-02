@@ -1,6 +1,7 @@
 package io.resttestgen.core.helper;
 
 import io.resttestgen.boot.AuthenticationInfo;
+import io.resttestgen.boot.WfcAuthInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.ParameterName;
@@ -36,7 +37,11 @@ public class RequestManager {
 
     private static final Logger logger = LogManager.getLogger(RequestManager.class);
 
+    // WFC auth (new preferred method) - uses WfcAuthHandler directly
+    private WfcAuthInfo wfcAuthInfo = Environment.getInstance().getApiUnderTest().getWfcAuthInfo();
+    // Legacy: authenticationCommands (external scripts) - kept for backward compatibility
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getApiUnderTest().getDefaultAuthenticationInfo();
+    
     public RequestManager(Operation operation) {
         this.source = operation;
         this.operation = operation.deepClone();
@@ -182,9 +187,46 @@ public class RequestManager {
                 requestBuilder.header(p.getName().toString(),
                         p.getValueAsFormattedString().replaceAll("[^\\x20-\\x7E]", "")));
 
-        // Apply authorization
-        if (authenticationInfo != null) {
+        // Apply authorization - prefer WfcAuthInfo (new), fallback to legacy AuthenticationInfo
+        if (wfcAuthInfo != null) {
+            // New: WFC auth using WfcAuthHandler directly
+            wfcAuthInfo.authenticateIfNot();
 
+            if (wfcAuthInfo.isAuthenticated()) {
+                if (!asFuzzed) {
+                    if (dropAuth) {
+                        switch (wfcAuthInfo.getIn()) {
+                            case HEADER:
+                                requestBuilder.removeHeader(wfcAuthInfo.getParameterName().toString());
+                                break;
+                            case QUERY:
+                                queryParametersMap.remove(wfcAuthInfo.getParameterName().toString());
+                                break;
+                            case COOKIE:
+                                logger.warn("Cookie parameters are not supported.");
+                                break;
+                        }
+                    } else {
+                        String authToken = wfcAuthInfo.getValue();
+                        if (token != null) {
+                            authToken = token;
+                        }
+                        switch (wfcAuthInfo.getIn()) {
+                            case HEADER:
+                                requestBuilder.header(wfcAuthInfo.getParameterName().toString(), authToken);
+                                break;
+                            case QUERY:
+                                queryParametersMap.put(wfcAuthInfo.getParameterName().toString(), wfcAuthInfo.getParameterName().toString() + "=" + authToken);
+                                break;
+                            case COOKIE:
+                                logger.warn("Cookie parameters are not supported.");
+                                break;
+                        }
+                    }
+                }
+            }
+        } else if (authenticationInfo != null) {
+            // Legacy: external scripts via authenticationCommands
             authenticationInfo.authenticateIfNot();
 
             if (authenticationInfo.isAuthenticated()) {
@@ -439,5 +481,9 @@ public class RequestManager {
 
     public void setAuthenticationInfo(AuthenticationInfo authenticationInfo) {
         this.authenticationInfo = authenticationInfo;
+    }
+
+    public void setWfcAuthInfo(WfcAuthInfo wfcAuthInfo) {
+        this.wfcAuthInfo = wfcAuthInfo;
     }
 }

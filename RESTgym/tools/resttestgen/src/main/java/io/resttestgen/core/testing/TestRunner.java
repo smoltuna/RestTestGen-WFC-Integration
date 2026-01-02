@@ -1,6 +1,7 @@
 package io.resttestgen.core.testing;
 
 import io.resttestgen.boot.AuthenticationInfo;
+import io.resttestgen.boot.WfcAuthInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
@@ -43,6 +44,9 @@ public class TestRunner {
     private final List<InteractionProcessor> interactionProcessors = new LinkedList<>();
     private final Set<HttpStatusCode> invalidStatusCodes = new HashSet<>();
     private static final int MAX_ATTEMPTS = 10;
+    // WFC auth (new preferred method) - uses WfcAuthHandler directly
+    private WfcAuthInfo wfcAuthInfo = Environment.getInstance().getApiUnderTest().getWfcAuthInfo();
+    // Legacy: authenticationCommands (external scripts) - kept for backward compatibility
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getApiUnderTest().getDefaultAuthenticationInfo();
     private final CoverageManager coverage = new CoverageManager();
 
@@ -185,7 +189,12 @@ public class TestRunner {
 
         // Build request with RequestManager
         RequestManager requestManager = new RequestManager(testInteraction.getFuzzedOperation());
-        requestManager.setAuthenticationInfo(authenticationInfo);
+        // Set auth - WFC takes precedence over legacy
+        if (wfcAuthInfo != null) {
+            requestManager.setWfcAuthInfo(wfcAuthInfo);
+        } else if (authenticationInfo != null) {
+            requestManager.setAuthenticationInfo(authenticationInfo);
+        }
         Request request = requestManager.buildRequest();
 
         // Update test interaction with request info
@@ -259,6 +268,10 @@ public class TestRunner {
 
     public void setAuthenticationInfo(AuthenticationInfo authenticationInfo) {
         this.authenticationInfo = authenticationInfo;
+    }
+
+    public void setWfcAuthInfo(WfcAuthInfo wfcAuthInfo) {
+        this.wfcAuthInfo = wfcAuthInfo;
     }
 
     public CoverageManager getCoverage(){

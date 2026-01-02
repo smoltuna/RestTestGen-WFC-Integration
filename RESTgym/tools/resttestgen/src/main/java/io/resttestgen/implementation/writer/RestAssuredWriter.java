@@ -1,6 +1,7 @@
 package io.resttestgen.implementation.writer;
 
 import io.resttestgen.boot.AuthenticationInfo;
+import io.resttestgen.boot.WfcAuthInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
@@ -246,8 +247,12 @@ public class RestAssuredWriter extends Writer {
     private void buildRequest(StringBuilder content,Operation operation,int numOperation ){
         content.append("\t\t//Build request\n ");
         content.append("\t\tRequestSpecification ").append(buildVariableName("request",numOperation,null,null)).append(" = RestAssured.given()");
+        // Prefer WFC auth, fallback to legacy authenticationInfo
+        WfcAuthInfo wfcAuthInfo = environment.getApiUnderTest().getWfcAuthInfo();
         AuthenticationInfo authInfo = environment.getApiUnderTest().getDefaultAuthenticationInfo();
-        if(authInfo != null){
+        if (wfcAuthInfo != null) {
+            content.append(".header(\"").append(wfcAuthInfo.getParameterName()).append("\",\"").append(wfcAuthInfo.getValue()).append("\")");
+        } else if (authInfo != null) {
             content.append(".header(\"Authorization\",\"").append(authInfo.getValue()).append("\")");
         }
         content.append(";\n");

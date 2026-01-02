@@ -11,25 +11,15 @@ COPY tools/resttestgen/src/ ./src/
 
 RUN gradle clean build -x test
 
-# Stage 2: Runtime (Eclipse Temurin 17 JRE with Python for auth scripts)
+# Stage 2: Runtime (Eclipse Temurin 17 JRE - pure Java, no Python needed)
 FROM eclipse-temurin:17-jre-jammy AS runtime
 
-# Install Python and dependencies for WFC auth scripts
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-yaml \
-    python3-requests \
-    && rm -rf /var/lib/apt/lists/*
+# No Python needed - WFC auth is now native Java
 
 WORKDIR /app
 
 # Copy built JAR from build stage
 COPY --from=builder /app/build/libs/*-all.jar ./rtg.jar
-
-# Copy WFC auth script to a global location
-COPY tools/resttestgen/scripts/wfc-auth.py /scripts/wfc-auth.py
-RUN chmod +x /scripts/wfc-auth.py
 
 # Create directory for WFC auth configurations
 RUN mkdir -p /auth /specifications

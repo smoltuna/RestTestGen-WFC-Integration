@@ -20,6 +20,7 @@ public class ApiUnderTest {
     // User provided information
     private String name;
     private String specificationFileName = "openapi.json";
+    private String authFileName; // WFC auth.yaml file name (e.g., "auth.yaml" or "api-auth.yaml")
     private String host;
     private Map<String, String> authenticationCommands;
     private String resetCommand;
@@ -34,6 +35,11 @@ public class ApiUnderTest {
     private transient String computedJsonSpecificationFileName;
     private transient String computedYamlSpecificationFileName;
     private transient String computedYmlSpecificationFileName;
+    
+    // WFC auth (new preferred method) - uses WfcAuthHandler directly
+    private transient WfcAuthInfo wfcAuthInfo;
+    
+    // Legacy: authenticationCommands (external scripts) - kept for backward compatibility
     private transient final Map<String, AuthenticationInfo> authenticationInfoMap = new LinkedHashMap<>();
 
     private static final Yaml yaml = new Yaml();
@@ -114,6 +120,27 @@ public class ApiUnderTest {
         if (apiConfigMap.get("host") != null) {
             setHost(this.host = apiConfigMap.get("host").toString());
         }
+        // Load WFC auth file name (new preferred method) - uses WfcAuthHandler directly
+        if (apiConfigMap.get("authFileName") != null) {
+            this.authFileName = apiConfigMap.get("authFileName").toString();
+            // authFileName can be absolute path (e.g., /auth/api-auth.yaml) or relative to API folder
+            File authFile = new File(this.authFileName);
+            String authFilePath;
+            if (authFile.isAbsolute()) {
+                authFilePath = this.authFileName;
+            } else {
+                authFilePath = getPath() + "auth/" + this.authFileName;
+                authFile = new File(authFilePath);
+            }
+            if (authFile.exists()) {
+                // Create WfcAuthInfo directly using WfcAuthHandler
+                this.wfcAuthInfo = new WfcAuthInfo(authFilePath, host);
+                logger.info("WFC authentication configured from: {}", authFilePath);
+            } else {
+                logger.warn("WFC auth file not found: {}. Authentication disabled.", authFilePath);
+            }
+        }
+        // Legacy: authenticationCommands (external scripts)
         if (apiConfigMap.get("authenticationCommands") != null) {
             this.authenticationCommands = (LinkedHashMap<String, String>) apiConfigMap.get("authenticationCommands");
             for (String description : this.authenticationCommands.keySet()) {
@@ -217,19 +244,28 @@ public class ApiUnderTest {
     }
 
     /**
-     * Gets the default AuthenticationInfo for the API, i.e., the one with "default" as description. In case no
-     * AuthenticationInfo has "default" as description, the first element of the map is returned.
-     * @return the default AuthenticationInfo.
+     * Gets the WFC auth info if configured (new preferred method).
+     * @return WfcAuthInfo or null if not configured
+     */
+    public WfcAuthInfo getWfcAuthInfo() {
+        return wfcAuthInfo;
+    }
+
+    /**
+     * Gets the default AuthenticationInfo for the API.
+     * Prefers WFC auth if configured, otherwise falls back to legacy authenticationCommands.
+     * @return the default AuthenticationInfo, or null if no auth configured.
      */
     public AuthenticationInfo getDefaultAuthenticationInfo() {
+        // Legacy: authenticationCommands
         if (getAuthenticationInfo("default") != null) {
             return getAuthenticationInfo("default");
         }
-        if (authenticationInfoMap.isEmpty()) {
-            return null;
+        if (!authenticationInfoMap.isEmpty()) {
+            Map.Entry<String, AuthenticationInfo> entry = authenticationInfoMap.entrySet().iterator().next();
+            return entry.getValue();
         }
-        Map.Entry<String, AuthenticationInfo> entry = authenticationInfoMap.entrySet().iterator().next();
-        return entry.getValue();
+        return null;
      }
 
     public void addAuthenticationCommand(String description, String command) {

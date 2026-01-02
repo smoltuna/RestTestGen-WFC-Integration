@@ -15,11 +15,12 @@ class WFCAuth:
     
     def __init__(self):
         self.api_name = os.environ.get('API', 'unknown')
+        self.port = os.environ.get('PORT', '8080')  # Dynamic port from RESTgym
         self.auth_config = None
         self.auth_users = []
         self.current_user_index = 0
         self.tokens = {}  # Cache tokens per user
-        self.base_url = "http://localhost:8080"
+        self.base_url = f"http://localhost:{self.port}"  # Default uses PORT env var
         self.initialized = False
         self.signup_done = {}  # Track signup per user
         
@@ -45,8 +46,12 @@ class WFCAuth:
             # Apply authTemplate to all auth entries
             template = self.auth_config.get('authTemplate', {})
             
-            # Get baseUrl from authTemplate or use default
-            self.base_url = template.get('baseUrl', 'http://localhost:8080')
+            # Get baseUrl: PORT env var > authTemplate > default
+            # If PORT env var is set, override authTemplate baseUrl with localhost:PORT
+            if os.environ.get('PORT'):
+                self.base_url = f"http://localhost:{self.port}"
+            else:
+                self.base_url = template.get('baseUrl', f"http://localhost:{self.port}")
             print(f"[WFC-AUTH] Using base URL: {self.base_url}", file=sys.stderr)
             
             self.auth_users = []
@@ -183,27 +188,8 @@ class WFCAuth:
         
         headers = {'Content-Type': content_type}
         
-        # Add any additional headers from config
-        for header in login_config.get('headers', []):
-            headers[header['name']] = header['value']
-        
-        # Prepare payload
-        payload = None
-        payload_raw = login_config.get('payloadRaw')
-        payload_user_pwd = login_config.get('payloadUserPwd')
-        
-        if payload_raw:
-            payload = payload_raw
-        elif payload_user_pwd:
-            username = payload_user_pwd.get('username')
-            password = payload_user_pwd.get('password')
-            username_field = payload_user_pwd.get('usernameField', 'username')
-            password_field = payload_user_pwd.get('passwordField', 'password')
-            
-            if 'json' in content_type.lower():
-                payload = json.dumps({username_field: username, password_field: password})
-            else:
-                payload = f"{username_field}={username}&{password_field}={password}"
+        # Prepare payload from payloadRaw (only supported format)
+        payload = login_config.get('payloadRaw')
         
         print(f"[WFC-AUTH] Performing login for {user_name} at {login_url}", file=sys.stderr)
         

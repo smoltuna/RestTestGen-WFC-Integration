@@ -7,9 +7,11 @@ specificationFileName: openapi.json
 # Override server URL from OpenAPI spec
 host: "http://localhost:9090"
 
-# Authentication commands - RestTestGen executes these and expects JSON output
-authenticationCommands:
-  default: "python3 /scripts/wfc-auth.py /auth/example-api-auth.yaml"
-  
-  # For simple static tokens
-  # default: 'echo {"name": "Authorization", "value": "Bearer test-token", "in": "header", "duration": 3600}'
+# WFC Authentication - RestTestGen reads the auth.yaml file directly
+# The host from this config is used for login endpoint URLs
+authFileName: /auth/example-api-auth.yaml
+
+# Legacy: Authentication commands (external scripts)
+# authenticationCommands:
+#   default: "python3 /scripts/wfc-auth.py /auth/example-api-auth.yaml"
+#   default: 'echo {"name": "Authorization", "value": "Bearer test-token", "in": "header", "duration": 3600}'

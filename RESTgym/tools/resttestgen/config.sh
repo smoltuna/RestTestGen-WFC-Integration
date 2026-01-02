@@ -16,10 +16,10 @@ specificationFileName: ${API}-openapi.json
 host: http://localhost:${PORT}
 EOF
 
-# Add authentication command if auth config exists
+# Add authentication file if auth config exists
+# Uses native Java WFC auth handler with authFileName
 if [ -f "/auth/${API}-auth.yaml" ]; then
-    echo "authenticationCommands:" >> /app/apis/experiment-api/api-config.yml
-    echo "  default: \"python3 /scripts/wfc-auth.py /auth/${API}-auth.yaml\"" >> /app/apis/experiment-api/api-config.yml
+    echo "authFileName: /auth/${API}-auth.yaml" >> /app/apis/experiment-api/api-config.yml
 fi
 
 echo "Configuration generated for API: ${API} on port ${PORT}"
