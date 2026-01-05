@@ -16,6 +16,7 @@ import io.resttestgen.implementation.writer.CoverageReportWriter;
 import io.resttestgen.implementation.writer.HtmlReportWriter;
 import io.resttestgen.implementation.writer.ReportWriter;
 import io.resttestgen.implementation.writer.RestAssuredWriter;
+import io.resttestgen.implementation.writer.WfcReportWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,6 +33,8 @@ public class NominalAndErrorStrategy extends Strategy {
     private final TestSequence globalNominalTestSequence = new TestSequence();
 
     public void start() {
+        long startTime = System.currentTimeMillis();
+        
         HtmlReportWriter htmlReportWriter = initializeHtmlReportWriter();
         List<TestSequence> testSequencesToReport = new ArrayList<>();
 
@@ -46,6 +49,10 @@ public class NominalAndErrorStrategy extends Strategy {
         
         htmlReportWriter.populateCoverageCollection(TestRunner.getInstance().getCoverage());
         injectTestSequenceData(htmlReportWriter, testSequencesToReport);
+        
+        // Write WFC Report using the abstract Writer class
+        long executionTimeInSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        writeWfcReport(executionTimeInSeconds);
     }
 
     private HtmlReportWriter initializeHtmlReportWriter() {
@@ -108,6 +115,28 @@ public class NominalAndErrorStrategy extends Strategy {
             coverageReportWriter.write();
         } catch (IOException e) {
             logger.warn("Could not write test coverage report to file.", e);
+        }
+    }
+
+    /**
+     * Writes the WFC (Web Fuzzing Commons) report.
+     * This report follows the standardized WFC schema and can be consumed by the WFC Web Report application.
+     * Uses the abstract Writer class for consistency with other RTG writers.
+     * 
+     * @param executionTimeInSeconds The total execution time in seconds
+     */
+    private void writeWfcReport(long executionTimeInSeconds) {
+        try {
+            // Use the global test sequence that aggregates all test interactions
+            WfcReportWriter wfcReportWriter = new WfcReportWriter(
+                    TestRunner.globalTestSequenceForDebug,
+                    TestRunner.getInstance().getCoverage(),
+                    executionTimeInSeconds
+            );
+            wfcReportWriter.write();
+            logger.info("WFC Report generated successfully.");
+        } catch (IOException e) {
+            logger.warn("Could not write WFC report to file.", e);
         }
     }
 

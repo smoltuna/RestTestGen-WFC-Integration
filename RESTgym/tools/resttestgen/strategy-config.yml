@@ -1,2 +1,3 @@
 NominalAndErrorStrategy:
-  timeBudget: 3600
+  timeBudget: 120
+  numberOfSequences: 5  # ridotto
