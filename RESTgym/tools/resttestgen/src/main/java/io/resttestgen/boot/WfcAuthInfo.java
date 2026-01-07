@@ -100,6 +100,7 @@ public class WfcAuthInfo {
     /**
      * Authenticate if not already authenticated or if token is expired.
      * - Fallback to unauthenticated mode after MAX_CONSECUTIVE_FAILURES
+     * - Implements retry logic, cooldown, and failure tracking
      */
     public boolean authenticateIfNot() {
         // If already in unauthenticated mode, just return

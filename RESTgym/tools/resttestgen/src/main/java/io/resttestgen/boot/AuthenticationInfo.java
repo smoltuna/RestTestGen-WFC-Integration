@@ -16,8 +16,6 @@ import java.util.LinkedHashMap;
 public class AuthenticationInfo {
 
     private static final Logger logger = LogManager.getLogger(AuthenticationInfo.class);
-    private static final int MAX_AUTH_ATTEMPTS = 5;
-    private static final long AUTH_COOLDOWN_SECONDS = 10;
 
     private String description;
     private String command;
@@ -26,12 +24,6 @@ public class AuthenticationInfo {
     private ParameterLocation in;
     private Long duration;
     private Long lastAuthUnixTimeStamp = 0L;
-
-    private String cachedValue = null;
-    private ParameterName cachedParameterName = null;
-    private ParameterLocation cachedIn = null;
-    private int authAttemptCount = 0;
-    private long lastAuthAttemptTime = 0L;
 
     private final static String ignoredAuthInfoError = "This authentication information will be probably ignored.";
 
@@ -98,11 +90,6 @@ public class AuthenticationInfo {
 
         // Finally, set authentication time with the time in which this method was called
         this.lastAuthUnixTimeStamp = currentUnixTime;
-        
-        // Cache successful auth values
-        this.cachedParameterName = this.parameterName;
-        this.cachedValue = this.value;
-        this.cachedIn = this.in;
 
         return true;
     }
@@ -119,50 +106,12 @@ public class AuthenticationInfo {
 
     /**
      * Performs authentication if the system is not authenticated.
-     * Limits retries and enforces cooldown.
-     * @return true if authentication succeeded, or if authentication was already processed.
+     * Simple version - just checks and authenticates if needed.
+     * @return true if authentication succeeded or already authenticated.
      */
     public boolean authenticateIfNot() {
         if (!isAuthenticated()) {
-            long now = getCurrentUnixTimeStamp();
-            
-            if (authAttemptCount >= MAX_AUTH_ATTEMPTS) {
-                if (cachedValue != null) {
-                    logger.warn("Auth: Max attempts ({}) reached. Using cached token.", MAX_AUTH_ATTEMPTS);
-                    return true;
-                }
-                logger.error("Auth: Max attempts ({}) reached with no cached token.", MAX_AUTH_ATTEMPTS);
-                return false;
-            }
-            
-            if (now - lastAuthAttemptTime < AUTH_COOLDOWN_SECONDS && authAttemptCount > 0) {
-                if (cachedValue != null) {
-                    logger.debug("Auth: Cooldown active, using cached token.");
-                    return true;
-                }
-                logger.warn("Auth: Cooldown active, no cached token available.");
-                return false;
-            }
-            
-            // Attempt authentication
-            authAttemptCount++;
-            lastAuthAttemptTime = now;
-            
-            if (!authenticate()) {
-                // Auth failed - use cached values if available
-                if (cachedValue != null) {
-                    logger.warn("Auth: Failed, falling back to cached token (attempt {}/{})", 
-                            authAttemptCount, MAX_AUTH_ATTEMPTS);
-                    this.parameterName = cachedParameterName;
-                    this.value = cachedValue;
-                    this.in = cachedIn;
-                    return true;
-                }
-                return false;
-            }
-            
-            // Auth succeeded - reset attempt counter
-            authAttemptCount = 0;
+            return authenticate();
         }
         return true;
     }
