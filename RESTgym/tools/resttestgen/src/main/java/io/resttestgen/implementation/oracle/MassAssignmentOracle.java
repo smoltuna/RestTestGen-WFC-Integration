@@ -13,6 +13,7 @@ import io.resttestgen.core.testing.Oracle;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestResult;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.WfcFaultCategory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,9 @@ import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
 
 /**
  * This oracle determines if a test sequences exposed a mass assignment vulnerability in the REST API.
+ * 
+ * WFC Fault Mapping:
+ * - Successful mass assignment injection is mapped to F203:Mass Assignment
  */
 public class MassAssignmentOracle extends Oracle {
 
@@ -68,7 +72,8 @@ public class MassAssignmentOracle extends Oracle {
         }
 
         if (sameValueCount == 2) {
-            testResult.setFail("The mass assignment injection was successful.");
+            testResult.setFail("The mass assignment injection was successful.",
+                    WfcFaultCategory.MASS_ASSIGNMENT);
         } else if (sameValueCount == 1) {
             testResult.setUnknown("The mass assignment injection was successful only for 1 attempt out of 2.");
         } else {

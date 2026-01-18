@@ -5,8 +5,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
+import io.resttestgen.core.testing.Oracle;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.TestResult;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.WfcFaultCategory;
 import io.resttestgen.core.testing.Writer;
 import io.resttestgen.core.testing.coverage.Coverage;
 import io.resttestgen.core.testing.coverage.CoverageManager;
@@ -38,6 +41,7 @@ public class WfcReportWriter extends Writer {
     
     private final CoverageManager coverageManager;
     private final long executionTimeInSeconds;
+    private final List<TestSequence> testSequences;
 
     /**
      * Creates a new WfcReportWriter.
@@ -45,11 +49,14 @@ public class WfcReportWriter extends Writer {
      * @param testSequence The aggregated test sequence containing all test interactions
      * @param coverageManager The coverage manager containing all coverage data
      * @param executionTimeInSeconds The total execution time in seconds
+     * @param testSequences The list of individual test sequences with oracle results
      */
-    public WfcReportWriter(TestSequence testSequence, CoverageManager coverageManager, long executionTimeInSeconds) {
+    public WfcReportWriter(TestSequence testSequence, CoverageManager coverageManager, 
+                           long executionTimeInSeconds, List<TestSequence> testSequences) {
         super(testSequence);
         this.coverageManager = Objects.requireNonNull(coverageManager, "CoverageManager cannot be null");
         this.executionTimeInSeconds = executionTimeInSeconds;
+        this.testSequences = testSequences != null ? testSequences : new ArrayList<>();
     }
 
     @Override
@@ -121,37 +128,92 @@ public class WfcReportWriter extends Writer {
 
     /**
      * Builds the faults section of the report.
-     * Detects potential faults based on 5xx responses.
+     * Detects faults from oracle results that have WFC fault categories assigned.
+     * Falls back to detecting 5xx responses for backwards compatibility.
      */
     private JsonObject buildFaultsSection() {
         JsonObject faults = new JsonObject();
         JsonArray foundFaults = new JsonArray();
-        int faultCount = 0;
+        Set<String> processedFaults = new HashSet<>(); // To avoid duplicate faults
         
+        // First, collect faults from oracle results (which have proper WFC fault categories)
+        for (TestSequence seq : testSequences) {
+            Map<Oracle, TestResult> testResults = seq.getTestResults();
+            for (Map.Entry<Oracle, TestResult> entry : testResults.entrySet()) {
+                TestResult result = entry.getValue();
+                if (result.isFail() && result.getFaultCategory() != null) {
+                    WfcFaultCategory faultCategory = result.getFaultCategory();
+                    
+                    // Get the relevant operation from the sequence
+                    String operationId = getOperationIdFromSequence(seq);
+                    String testCaseId = seq.getName() + "-" + seq.getId();
+                    String faultKey = operationId + "|" + testCaseId + "|" + faultCategory.getCode();
+                    
+                    if (!processedFaults.contains(faultKey)) {
+                        JsonObject fault = buildFaultObject(operationId, testCaseId, faultCategory, result.getMessage());
+                        foundFaults.add(fault);
+                        processedFaults.add(faultKey);
+                    }
+                }
+            }
+        }
+        
+        // Fallback: Also detect 5xx responses from aggregated test sequence (for faults not caught by oracles)
         for (TestInteraction interaction : testSequence) {
             if (interaction.getResponseStatusCode() != null && 
                 interaction.getResponseStatusCode().getCode() >= 500) {
                 
-                JsonObject fault = new JsonObject();
-                fault.addProperty("operationId", formatOperationId(interaction.getFuzzedOperation()));
-                fault.addProperty("testCaseId", testSequence.getName() + "-" + testSequence.getId());
+                String operationId = formatOperationId(interaction.getFuzzedOperation());
+                String testCaseId = testSequence.getName() + "-" + testSequence.getId();
+                String faultKey = operationId + "|" + testCaseId + "|" + WfcFaultCategory.HTTP_STATUS_500.getCode();
                 
-                JsonArray categories = new JsonArray();
-                JsonObject category = new JsonObject();
-                category.addProperty("code", 500);
-                category.addProperty("context", "HTTP " + interaction.getResponseStatusCode().getCode());
-                categories.add(category);
-                
-                fault.add("faultCategories", categories);
-                foundFaults.add(fault);
-                faultCount++;
+                if (!processedFaults.contains(faultKey)) {
+                    JsonObject fault = buildFaultObject(
+                            operationId, 
+                            testCaseId, 
+                            WfcFaultCategory.HTTP_STATUS_500,
+                            "HTTP " + interaction.getResponseStatusCode().getCode()
+                    );
+                    foundFaults.add(fault);
+                    processedFaults.add(faultKey);
+                }
             }
         }
         
-        faults.addProperty("totalNumber", faultCount);
+        faults.addProperty("totalNumber", foundFaults.size());
         faults.add("foundFaults", foundFaults);
         
         return faults;
+    }
+
+    /**
+     * Builds a fault JSON object with the given parameters.
+     */
+    private JsonObject buildFaultObject(String operationId, String testCaseId, 
+                                         WfcFaultCategory faultCategory, String context) {
+        JsonObject fault = new JsonObject();
+        fault.addProperty("operationId", operationId);
+        fault.addProperty("testCaseId", testCaseId);
+        
+        JsonArray categories = new JsonArray();
+        JsonObject category = new JsonObject();
+        category.addProperty("code", faultCategory.getCode());
+        category.addProperty("context", context != null ? context : faultCategory.getDescriptiveName());
+        categories.add(category);
+        
+        fault.add("faultCategories", categories);
+        return fault;
+    }
+
+    /**
+     * Gets the operation ID from the last interaction in a test sequence.
+     */
+    private String getOperationIdFromSequence(TestSequence seq) {
+        if (seq.isEmpty()) {
+            return "UNKNOWN:/unknown";
+        }
+        TestInteraction lastInteraction = seq.getLast();
+        return formatOperationId(lastInteraction.getFuzzedOperation());
     }
 
     /**

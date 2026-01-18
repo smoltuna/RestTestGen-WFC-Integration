@@ -51,8 +51,9 @@ public class NominalAndErrorStrategy extends Strategy {
         injectTestSequenceData(htmlReportWriter, testSequencesToReport);
         
         // Write WFC Report using the abstract Writer class
+        // Pass all test sequences for proper Oracle result -> WFC fault mapping
         long executionTimeInSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        writeWfcReport(executionTimeInSeconds);
+        writeWfcReport(executionTimeInSeconds, testSequencesToReport);
     }
 
     private HtmlReportWriter initializeHtmlReportWriter() {
@@ -123,13 +124,20 @@ public class NominalAndErrorStrategy extends Strategy {
      * This report follows the standardized WFC schema and can be consumed by the WFC Web Report application.
      * Uses the abstract Writer class for consistency with other RTG writers.
      * 
+     * Fault mappings:
+     * - StatusCodeOracle (FAIL on 5xx) → F100: HTTP Status 500
+     * - ErrorStatusCodeOracle (FAIL on 2xx for invalid input) → F102: Received Success Response When Sending Wrong Data
+     * - ErrorStatusCodeOracle (FAIL on 5xx) → F100: HTTP Status 500
+     * 
      * @param executionTimeInSeconds The total execution time in seconds
+     * @param testSequences All test sequences with their Oracle results for proper fault detection
      */
-    private void writeWfcReport(long executionTimeInSeconds) {
+    private void writeWfcReport(long executionTimeInSeconds, List<TestSequence> testSequences) {
         try {
-            // Use the global test sequence that aggregates all test interactions
+            // Use constructor that accepts all test sequences for Oracle result -> WFC fault mapping
             WfcReportWriter wfcReportWriter = new WfcReportWriter(
                     TestRunner.globalTestSequenceForDebug,
+                    testSequences,
                     TestRunner.getInstance().getCoverage(),
                     executionTimeInSeconds
             );

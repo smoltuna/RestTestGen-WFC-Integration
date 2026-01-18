@@ -8,6 +8,11 @@ public class TestResult {
 
     private TestResultEnum result = TestResultEnum.PENDING;
     private String message = "Pending evaluation.";
+    
+    /**
+     * The WFC fault category associated with a failed test result.
+     */
+    private WfcFaultCategory faultCategory = null;
 
 
     public TestResult setPass() {
@@ -31,6 +36,16 @@ public class TestResult {
     public TestResult setFail(String message) {
         this.result = TestResultEnum.FAIL;
         this.message = message;
+        return this;
+    }
+
+    /**
+     * Sets the test result as failed with a message and a WFC fault category.
+     */
+    public TestResult setFail(String message, WfcFaultCategory faultCategory) {
+        this.result = TestResultEnum.FAIL;
+        this.message = message;
+        this.faultCategory = faultCategory;
         return this;
     }
 
@@ -76,5 +91,21 @@ public class TestResult {
 
     public boolean isUnknown() {
         return result == TestResultEnum.UNKNOWN;
+    }
+
+    /**
+     * Returns the WFC fault category associated with this test result.
+     * @return The fault category, or null if no category was assigned
+     */
+    public WfcFaultCategory getFaultCategory() {
+        return faultCategory;
+    }
+
+    /**
+     * Returns the message associated with this test result.
+     * @return The result message
+     */
+    public String getMessage() {
+        return message;
     }
 }

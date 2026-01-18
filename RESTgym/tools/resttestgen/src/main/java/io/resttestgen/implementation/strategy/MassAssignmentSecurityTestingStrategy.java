@@ -11,10 +11,12 @@ import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.implementation.fuzzer.MassAssignmentFuzzer;
 import io.resttestgen.implementation.oracle.MassAssignmentOracle;
 import io.resttestgen.implementation.writer.ReportWriter;
+import io.resttestgen.implementation.writer.WfcReportWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -26,6 +28,10 @@ public class MassAssignmentSecurityTestingStrategy extends Strategy {
 
     @Override
     public void start() {
+        long startTime = System.currentTimeMillis();
+        
+        // List to collect all test sequences for WFC report generation
+        List<TestSequence> allTestSequences = new ArrayList<>();
 
         // Extract/infer resource types handled by operations
         CrudInformationExtractor crudInformationExtractor = new CrudInformationExtractor();
@@ -49,6 +55,9 @@ public class MassAssignmentSecurityTestingStrategy extends Strategy {
 
                 // Evaluate sequence with oracle
                 massAssignmentOracle.assertTestSequence(testSequence);
+                
+                // Collect for WFC report
+                allTestSequences.add(testSequence);
 
                 // Write report to file
                 try {
@@ -67,6 +76,24 @@ public class MassAssignmentSecurityTestingStrategy extends Strategy {
                 logger.warn("Could not write global report to file.");
             }
 
+        }
+        
+        // Write WFC Report with all test sequences for proper Oracle result -> F203 fault mapping
+        long executionTimeInSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        writeWfcReport(executionTimeInSeconds, allTestSequences);
+    }
+    
+    /**
+     * Writes the WFC (Web Fuzzing Commons) report.
+     */
+    private void writeWfcReport(long executionTimeInSeconds, List<TestSequence> testSequences) {
+        try {
+            // Use constructor that accepts all test sequences for Oracle result -> WFC fault mapping
+            WfcReportWriter wfcReportWriter = new WfcReportWriter(testSequences, executionTimeInSeconds);
+            wfcReportWriter.write();
+            logger.info("WFC Report generated successfully.");
+        } catch (IOException e) {
+            logger.warn("Could not write WFC report to file.", e);
         }
     }
 }
