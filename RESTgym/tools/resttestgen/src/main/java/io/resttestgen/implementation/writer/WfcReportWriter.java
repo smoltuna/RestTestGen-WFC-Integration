@@ -59,6 +59,20 @@ public class WfcReportWriter extends Writer {
         this.testSequences = testSequences != null ? testSequences : new ArrayList<>();
     }
 
+    /**
+     * Convenience constructor that creates a WfcReportWriter without explicit coverage manager.
+     * Creates a minimal test sequence and empty coverage manager for compatibility.
+     *
+     * @param testSequences The list of test sequences
+     * @param executionTimeInSeconds The total execution time in seconds
+     */
+    public WfcReportWriter(List<TestSequence> testSequences, long executionTimeInSeconds) {
+        super(testSequences.isEmpty() ? new TestSequence() : testSequences.get(0));
+        this.coverageManager = new CoverageManager();
+        this.executionTimeInSeconds = executionTimeInSeconds;
+        this.testSequences = testSequences != null ? testSequences : new ArrayList<>();
+    }
+
     @Override
     public String getOutputFormatName() {
         return "wfc-report";

@@ -32,6 +32,7 @@ public class Configuration {
     private final List<String> qualifiableParameterNames;
     private boolean globalOutputPath;
     private String odgFileName;
+    private Long randomSeed;
 
     /**
      * Initializes the default configuration
@@ -57,6 +58,16 @@ public class Configuration {
         qualifiableParameterNames = new ArrayList<>();
         qualifiableParameterNames.add("id");
         qualifiableParameterNames.add("name");
+
+        randomSeed = null; // Use random seed by default (non-deterministic)
+    }
+
+    public Long getRandomSeed() {
+        return randomSeed;
+    }
+
+    public void setRandomSeed(Long randomSeed) {
+        this.randomSeed = randomSeed;
     }
 
     public Level getLogVerbosity() {
@@ -183,6 +194,15 @@ public class Configuration {
         }
         if (configMap.get("resultsLocation") != null) {
             configuration.setResultsLocation(configMap.get("resultsLocation").toString());
+        }
+        if (configMap.get("randomSeed") != null) {
+            Object seedValue = configMap.get("randomSeed");
+            if (seedValue instanceof Number) {
+                configuration.setRandomSeed(((Number) seedValue).longValue());
+            } else {
+                configuration.setRandomSeed(Long.parseLong(seedValue.toString()));
+            }
+            logger.info("Using fixed random seed: " + configuration.getRandomSeed());
         }
 
         return configuration;

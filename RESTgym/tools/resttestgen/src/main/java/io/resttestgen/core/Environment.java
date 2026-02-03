@@ -53,7 +53,16 @@ public class Environment {
         this.globalResponseDictionary = new Dictionary();
         this.globalRequestDictionary = new Dictionary();
         this.partialDictionary = new Dictionary();
-        this.random = new ExtendedRandom();
+        
+        // Use fixed seed if configured, otherwise use random seed
+        Long seed = configuration.getRandomSeed();
+        if (seed != null) {
+            this.random = new ExtendedRandom(seed);
+            logger.info("Using fixed random seed: " + seed);
+        } else {
+            this.random = new ExtendedRandom();
+        }
+        
         this.experience = new Experience();
 
         return this;

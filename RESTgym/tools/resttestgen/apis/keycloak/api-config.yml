@@ -3,8 +3,8 @@ name: keycloak
 
 specificationFileName: openapi.json
 
-# Server URL - use container name on same Docker network
-host: "http://keycloak:8080"
+# Server URL - localhost for testing
+host: "http://localhost:9094"
 
 # WFC Authentication - OAuth2 via OIDC token endpoint
 authFileName: keycloak-auth.yaml

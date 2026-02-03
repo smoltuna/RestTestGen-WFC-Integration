@@ -1,11 +1,4 @@
-# QuartzManager API Configuration for RestTestGen + WFC Auth
 name: QuartzManager
-
 specificationFileName: openapi.json
-
-# Server URL - must match where the API is running
-host: "http://localhost:8080"
-
-# WFC Authentication - JWT via login endpoint
-# Path is relative to api folder, so auth/quartzmanager-auth.yaml
+host: "http://localhost:8081"
 authFileName: quartzmanager-auth.yaml

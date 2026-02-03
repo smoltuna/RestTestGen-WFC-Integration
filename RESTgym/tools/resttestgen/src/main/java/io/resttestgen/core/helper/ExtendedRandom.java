@@ -24,6 +24,21 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 public class ExtendedRandom extends Random {
 
     /**
+     * Default constructor with random seed.
+     */
+    public ExtendedRandom() {
+        super();
+    }
+
+    /**
+     * Constructor with fixed seed for reproducible testing.
+     * @param seed the seed for the random number generator.
+     */
+    public ExtendedRandom(long seed) {
+        super(seed);
+    }
+
+    /**
      * Returns a positive integer.
      * @return the positive integer.
      */

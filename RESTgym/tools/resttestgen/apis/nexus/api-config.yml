@@ -1,0 +1,5 @@
+name: nexus
+host: http://localhost:9096
+specificationFileName: nexus-openapi.json
+randomSeed: 12345
+authFileName: nexus-auth.yaml

@@ -1,2 +1,5 @@
-apiUnderTest: keycloak
+apiUnderTest: gravitee
 strategyClassName: NominalAndErrorStrategy
+randomSeed: 12345
+nominalFuzzer.numberOfMutations: 1
+errorFuzzer.numberOfMutations: 1

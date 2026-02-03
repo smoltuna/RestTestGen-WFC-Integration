@@ -7,7 +7,7 @@ auth:
       payloadRaw: "grant_type=password&client_id=admin-cli&username=admin&password=admin"
 
 authTemplate:
-  baseUrl: http://keycloak:8080
+  baseUrl: http://localhost:9094
   loginEndpointAuth:
     endpoint: /realms/master/protocol/openid-connect/token
     verb: POST

@@ -1,0 +1,10 @@
+# RealWorld Backend Micronaut - API with JWT + Signup
+name: realworld
+
+specificationFileName: openapi.yaml
+
+# Server URL - localhost since we're running locally
+host: "http://localhost:8080"
+
+# WFC Authentication - DISABLED for baseline test
+# authFileName: realworld-auth.yaml

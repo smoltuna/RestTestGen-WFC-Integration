@@ -59,6 +59,11 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             min = parameter.isExclusiveMinimum() ? min + Double.MIN_VALUE : min;
             max = parameter.isExclusiveMaximum() ? max - Double.MIN_VALUE : max;
 
+            // Ensure min < max for random generation (fix for OpenAPI specs with invalid ranges)
+            if (min >= max) {
+                return min; // Return the boundary value if range is invalid
+            }
+
             // Generate and return the value
             return random.nextDoubl(min, max);
         }
@@ -73,6 +78,11 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             // Restrict the boundaries
             min = Math.max((float) NUMBER_LOWER_BOUND, min);
             max = Math.min((float) NUMBER_UPPER_BOUND, max);
+
+            // Ensure min < max for random generation (fix for OpenAPI specs with invalid ranges)
+            if (min >= max) {
+                return min.floatValue(); // Return the boundary value if range is invalid
+            }
 
             Double value = random.nextDoubl(min, max);
 
@@ -94,6 +104,12 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             // Exclude values if minimum or maximum are exclusive
             min = parameter.isExclusiveMinimum() ? min + 1 : min;
             max = parameter.isExclusiveMaximum() ? max - 1 : max;
+
+            // Ensure min < max for random generation (fix for OpenAPI specs with invalid ranges)
+            // Java's Random.nextInt/nextLong require origin < bound
+            if (min >= max) {
+                return isLong ? min.longValue() : min.intValue();
+            }
 
             if (isLong) {
                 return random.nextLong(min.longValue(), max.longValue());

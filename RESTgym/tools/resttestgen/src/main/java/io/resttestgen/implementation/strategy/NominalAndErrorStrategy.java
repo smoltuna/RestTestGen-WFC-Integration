@@ -137,9 +137,9 @@ public class NominalAndErrorStrategy extends Strategy {
             // Use constructor that accepts all test sequences for Oracle result -> WFC fault mapping
             WfcReportWriter wfcReportWriter = new WfcReportWriter(
                     TestRunner.globalTestSequenceForDebug,
-                    testSequences,
                     TestRunner.getInstance().getCoverage(),
-                    executionTimeInSeconds
+                    executionTimeInSeconds,
+                    testSequences
             );
             wfcReportWriter.write();
             logger.info("WFC Report generated successfully.");

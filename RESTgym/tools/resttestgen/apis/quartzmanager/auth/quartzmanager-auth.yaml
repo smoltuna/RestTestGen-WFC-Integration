@@ -7,7 +7,7 @@ auth:
       payloadRaw: "username=restapitestteam@gmail.com&password=universe"
 
 authTemplate:
-  baseUrl: http://localhost:8080
+  baseUrl: http://localhost:8081
   loginEndpointAuth:
     endpoint: /quartz-manager/auth/login
     verb: POST
