@@ -1,0 +1,27 @@
+# WFC Authentication Configuration for FlightSearchAPI
+# JWT via register + login endpoint with JSON body
+
+auth:
+  - name: admin
+    # Register-then-login workflow
+    registerEndpointAuth:
+      payloadRaw: '{"email":"admin@test.com","password":"Admin123!","firstName":"Admin","lastName":"User","phoneNumber":"12345678901","userType":"ADMIN"}'
+    loginEndpointAuth:
+      payloadRaw: '{"email":"admin@test.com","password":"Admin123!"}'
+
+authTemplate:
+  baseUrl: http://localhost:8080
+  registerEndpointAuth:
+    endpoint: /api/v1/authentication/user/register
+    verb: POST
+    contentType: application/json
+  loginEndpointAuth:
+    endpoint: /api/v1/authentication/user/login
+    verb: POST
+    contentType: application/json
+    token:
+      extractFrom: body
+      extractSelector: /response/accessToken
+      sendIn: header
+      sendName: Authorization
+      sendTemplate: "Bearer {token}"

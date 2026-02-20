@@ -158,3 +158,4 @@ results/
 
 # Test results in local APIs directories
 apis/**/results/
+.DS_Store

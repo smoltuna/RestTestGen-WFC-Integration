@@ -1,0 +1,4 @@
+name: FlightSearchAPI
+specificationFileName: flightsearchapi-openapi.json
+host: "http://localhost:8080"
+authFileName: flightsearchapi-auth.yaml

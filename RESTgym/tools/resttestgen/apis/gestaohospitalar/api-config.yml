@@ -1,0 +1,3 @@
+name: gestaohospitalar
+specificationFileName: gestaohospitalar-openapi.json
+host: "http://localhost:8080"

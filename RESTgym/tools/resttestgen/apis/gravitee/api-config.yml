@@ -1,4 +1,4 @@
 name: gravitee
 specificationFileName: gravitee-openapi.json
-host: http://localhost:9097
-randomSeed: 12345
+host: "http://localhost:8083"
+authFileName: gravitee-auth.yaml

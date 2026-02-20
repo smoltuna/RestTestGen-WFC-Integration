@@ -1,4 +1,4 @@
-apiUnderTest: gravitee
+apiUnderTest: petclinic
 strategyClassName: NominalAndErrorStrategy
 randomSeed: 12345
 nominalFuzzer.numberOfMutations: 1

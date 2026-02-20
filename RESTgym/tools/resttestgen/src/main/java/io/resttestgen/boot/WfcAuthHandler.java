@@ -8,17 +8,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.FileInputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Handles WFC (Web Fuzzing Configuration) authentication schema.
- * Supports:
- * - fixedHeaders: Static authentication headers (e.g., Basic Auth)
- * - loginEndpointAuth: Dynamic token-based auth (JWT, OAuth2, etc.)
+ * Handles WFC (Web Fuzzing Commons) authentication schema.
+ * Conforms to the WFC auth.yaml specification (JSON Schema draft 2020-12).
+ *
  */
 public class WfcAuthHandler {
 
@@ -39,12 +39,12 @@ public class WfcAuthHandler {
     }
 
     /**
-     * Result of WFC authentication containing header info.
+     * Result of WFC authentication containing header/query/cookie info.
      */
     public static class AuthResult {
         public final String headerName;
         public final String headerValue;
-        public final String location; // "header", "query", etc.
+        public final String location; // "header", "query", "cookie"
         public final long duration; // seconds until expiration
 
         public AuthResult(String headerName, String headerValue, String location, long duration) {
@@ -57,17 +57,30 @@ public class WfcAuthHandler {
 
     /**
      * Load and process WFC auth.yaml file, returning authentication result.
-     * 
-     * @param authYamlPath Path to the auth.yaml file
+     *
+     * @param authYamlPath    Path to the auth.yaml file
      * @param baseUrlOverride Optional base URL override (e.g., from dynamic port)
      * @return AuthResult containing header info, or null if auth fails
      */
+    @SuppressWarnings("unchecked")
     public AuthResult authenticate(String authYamlPath, String baseUrlOverride) {
         try {
             Map<String, Object> config = yaml.load(new FileInputStream(authYamlPath));
             if (config == null || !config.containsKey("auth")) {
                 logger.error("Invalid WFC auth.yaml - missing 'auth' array");
                 return null;
+            }
+
+            // Log schema version if present
+            String schemaVersion = (String) config.get("schemaVersion");
+            if (schemaVersion != null) {
+                logger.info("WFC: Auth schema version: {}", schemaVersion);
+            }
+
+            // Log configs if present
+            Map<String, String> configs = (Map<String, String>) config.get("configs");
+            if (configs != null && !configs.isEmpty()) {
+                logger.info("WFC: Custom configs found: {}", configs.keySet());
             }
 
             // Get template and users
@@ -112,14 +125,24 @@ public class WfcAuthHandler {
     /**
      * Process authentication for a user configuration.
      */
+    @SuppressWarnings("unchecked")
     private AuthResult processAuth(String baseUrl, Map<String, Object> user) {
         // Check for fixed headers first (no login required)
         List<Map<String, String>> fixedHeaders = (List<Map<String, String>>) user.get("fixedHeaders");
         if (fixedHeaders != null && !fixedHeaders.isEmpty()) {
+            // Use the first fixed header as the primary auth header.
+            // If multiple are present, log them all but return the first for AuthResult
+            // (RequestManager applies it; additional headers are logged as informational).
+            if (fixedHeaders.size() > 1) {
+                logger.info("WFC: {} fixed headers found; using first as primary auth", fixedHeaders.size());
+                for (int i = 1; i < fixedHeaders.size(); i++) {
+                    logger.info("WFC: Additional fixed header [{}]: {}", i, fixedHeaders.get(i).get("name"));
+                }
+            }
             Map<String, String> header = fixedHeaders.get(0);
             String name = header.get("name");
             String value = header.get("value");
-            logger.info("WFC: Using fixed header authentication");
+            logger.info("WFC: Using fixed header authentication ({})", name);
             return new AuthResult(name, value, "header", DEFAULT_DURATION);
         }
 
@@ -141,6 +164,34 @@ public class WfcAuthHandler {
     }
 
     /**
+     * Return all fixed headers from the user config (for callers that need them all).
+     * Returns an empty list if no fixedHeaders are defined or login-based auth is used.
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, String>> getAllFixedHeaders(String authYamlPath, String baseUrlOverride) {
+        try {
+            Map<String, Object> config = yaml.load(new FileInputStream(authYamlPath));
+            if (config == null || !config.containsKey("auth")) return Collections.emptyList();
+
+            Map<String, Object> template = getMapOrEmpty(config, "authTemplate");
+            List<Map<String, Object>> users = (List<Map<String, Object>>) config.get("auth");
+            if (users == null || users.isEmpty()) return Collections.emptyList();
+
+            Map<String, Object> selectedUser = null;
+            for (Map<String, Object> user : users) {
+                if ("default".equals(user.get("name"))) { selectedUser = user; break; }
+            }
+            if (selectedUser == null) selectedUser = users.get(0);
+
+            Map<String, Object> merged = mergeWithTemplate(selectedUser, template);
+            List<Map<String, String>> fixedHeaders = (List<Map<String, String>>) merged.get("fixedHeaders");
+            return fixedHeaders != null ? fixedHeaders : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
      * Perform user signup/registration (extension to WFC schema).
      */
     private void performSignup(String baseUrl, Map<String, Object> signupConfig) {
@@ -159,11 +210,7 @@ public class WfcAuthHandler {
                     .addHeader("Content-Type", contentType)
                     .addHeader("Accept", "application/json");
 
-            if ("POST".equals(verb)) {
-                requestBuilder.post(body);
-            } else if ("PUT".equals(verb)) {
-                requestBuilder.put(body);
-            }
+            applyVerb(requestBuilder, verb, body);
 
             Response response = httpClient.newCall(requestBuilder.build()).execute();
             int statusCode = response.code();
@@ -181,8 +228,9 @@ public class WfcAuthHandler {
     }
 
     /**
-     * Perform login and extract token.
+     * Perform login and extract token (or cookies).
      */
+    @SuppressWarnings("unchecked")
     private AuthResult performLogin(String baseUrl, Map<String, Object> loginConfig) {
         String endpoint = (String) loginConfig.getOrDefault("endpoint", "");
         String externalUrl = (String) loginConfig.get("externalEndpointURL");
@@ -190,14 +238,20 @@ public class WfcAuthHandler {
         String contentType = (String) loginConfig.getOrDefault("contentType", "application/json");
 
         // Determine login URL
-        String loginUrl = (externalUrl != null && !externalUrl.isEmpty()) 
-                ? externalUrl 
+        String loginUrl = (externalUrl != null && !externalUrl.isEmpty())
+                ? externalUrl
                 : joinUrl(baseUrl, endpoint);
 
         logger.info("WFC: Performing login at {}", loginUrl);
 
-        // Get payload (only payloadRaw is supported)
+        // Build payload: prefer payloadRaw, fallback to payloadUserPwd
         String payload = (String) loginConfig.get("payloadRaw");
+        if (payload == null) {
+            Map<String, Object> userPwd = getMapOrEmpty(loginConfig, "payloadUserPwd");
+            if (!userPwd.isEmpty()) {
+                payload = buildPayloadFromUserPwd(userPwd, contentType);
+            }
+        }
 
         try {
             RequestBody body = RequestBody.create(payload != null ? payload : "", MediaType.parse(contentType));
@@ -206,17 +260,24 @@ public class WfcAuthHandler {
                     .addHeader("Content-Type", contentType)
                     .addHeader("Accept", "application/json");
 
-            if ("POST".equals(verb)) {
-                requestBuilder.post(body);
-            } else if ("GET".equals(verb)) {
-                requestBuilder.get();
-            } else if ("PUT".equals(verb)) {
-                requestBuilder.put(body);
+            // Apply additional login headers from config
+            List<Map<String, String>> loginHeaders = (List<Map<String, String>>) loginConfig.get("headers");
+            if (loginHeaders != null) {
+                for (Map<String, String> h : loginHeaders) {
+                    String hName = h.get("name");
+                    String hValue = h.get("value");
+                    if (hName != null && hValue != null) {
+                        requestBuilder.addHeader(hName, hValue);
+                    }
+                }
             }
+
+            applyVerb(requestBuilder, verb, body);
 
             Response response = httpClient.newCall(requestBuilder.build()).execute();
             int statusCode = response.code();
             String responseBody = response.body() != null ? response.body().string() : "";
+            Headers responseHeaders = response.headers();
             response.close();
 
             logger.info("WFC: Login response: {}", statusCode);
@@ -226,6 +287,12 @@ public class WfcAuthHandler {
                 return null;
             }
 
+            // Check if we should extract cookies instead of a token
+            Boolean expectCookies = (Boolean) loginConfig.get("expectCookies");
+            if (Boolean.TRUE.equals(expectCookies)) {
+                return extractCookies(responseHeaders);
+            }
+
             // Extract token from response
             Map<String, Object> tokenConfig = getMapOrEmpty(loginConfig, "token");
             if (tokenConfig.isEmpty()) {
@@ -233,7 +300,7 @@ public class WfcAuthHandler {
                 return null;
             }
 
-            return extractToken(responseBody, tokenConfig);
+            return extractToken(responseBody, responseHeaders, tokenConfig);
 
         } catch (Exception e) {
             logger.error("WFC: Login error: {}", e.getMessage());
@@ -242,40 +309,136 @@ public class WfcAuthHandler {
     }
 
     /**
-     * Extract token from JSON response using JSON pointer.
+     * Build a payload string from the structured payloadUserPwd object,
+     * formatted according to the given contentType.
      */
-    private AuthResult extractToken(String responseBody, Map<String, Object> tokenConfig) {
-        String extractFromField = (String) tokenConfig.get("extractFromField");
-        String httpHeaderName = (String) tokenConfig.getOrDefault("httpHeaderName", "Authorization");
-        String headerPrefix = (String) tokenConfig.getOrDefault("headerPrefix", "");
+    private String buildPayloadFromUserPwd(Map<String, Object> userPwd, String contentType) {
+        String username = (String) userPwd.get("username");
+        String password = (String) userPwd.get("password");
+        String usernameField = (String) userPwd.get("usernameField");
+        String passwordField = (String) userPwd.get("passwordField");
 
-        if (extractFromField == null || extractFromField.isEmpty()) {
-            logger.error("WFC: No extractFromField specified in token config");
+        if (username == null || password == null || usernameField == null || passwordField == null) {
+            logger.error("WFC: payloadUserPwd missing required fields");
+            return null;
+        }
+
+        if (contentType != null && contentType.contains("x-www-form-urlencoded")) {
+            return URLEncoder.encode(usernameField, StandardCharsets.UTF_8) + "=" +
+                    URLEncoder.encode(username, StandardCharsets.UTF_8) + "&" +
+                    URLEncoder.encode(passwordField, StandardCharsets.UTF_8) + "=" +
+                    URLEncoder.encode(password, StandardCharsets.UTF_8);
+        }
+
+        // Default: JSON
+        JsonObject json = new JsonObject();
+        json.addProperty(usernameField, username);
+        json.addProperty(passwordField, password);
+        return gson.toJson(json);
+    }
+
+    /**
+     * Extract cookies from login response headers (expectCookies mode).
+     */
+    private AuthResult extractCookies(Headers responseHeaders) {
+        List<String> setCookies = responseHeaders.values("Set-Cookie");
+        if (setCookies.isEmpty()) {
+            logger.error("WFC: expectCookies=true but no Set-Cookie headers in response");
+            return null;
+        }
+
+        // Build a combined Cookie header value from all Set-Cookie entries
+        StringBuilder cookieValue = new StringBuilder();
+        for (String sc : setCookies) {
+            // Extract cookie name=value (before first ';')
+            String nameValue = sc.contains(";") ? sc.substring(0, sc.indexOf(';')) : sc;
+            if (cookieValue.length() > 0) cookieValue.append("; ");
+            cookieValue.append(nameValue.trim());
+        }
+
+        logger.info("WFC: Extracted {} cookies from login response", setCookies.size());
+        return new AuthResult("Cookie", cookieValue.toString(), "cookie", DEFAULT_DURATION);
+    }
+
+    /**
+     * Extract token from login response (body or header), using standard WFC 0.2.0 field names.
+     */
+    private AuthResult extractToken(String responseBody, Headers responseHeaders, Map<String, Object> tokenConfig) {
+        String extractFrom = (String) tokenConfig.getOrDefault("extractFrom", "body");
+        String extractSelector = (String) tokenConfig.get("extractSelector");
+        String sendIn = (String) tokenConfig.getOrDefault("sendIn", "header");
+        String sendName = (String) tokenConfig.getOrDefault("sendName", "Authorization");
+        String sendTemplate = (String) tokenConfig.get("sendTemplate");
+
+        if (extractSelector == null || extractSelector.isEmpty()) {
+            logger.error("WFC: No extractSelector specified in token config");
             return null;
         }
 
         try {
-            JsonObject json = gson.fromJson(responseBody, JsonObject.class);
-            
-            // Parse JSON pointer (e.g., "/access_token" or "/user/token")
-            String token = extractJsonPointer(json, extractFromField);
-            
-            if (token == null || token.isEmpty()) {
-                logger.error("WFC: Failed to extract token using {}", extractFromField);
-                return null;
+            String token;
+
+            if ("header".equalsIgnoreCase(extractFrom)) {
+                // Extract token from response header
+                token = responseHeaders.get(extractSelector);
+                if (token == null || token.isEmpty()) {
+                    logger.error("WFC: Failed to extract token from response header '{}'", extractSelector);
+                    return null;
+                }
+            } else {
+                // Extract token from response body (JSON Pointer)
+                JsonObject json = gson.fromJson(responseBody, JsonObject.class);
+                token = extractJsonPointer(json, extractSelector);
+
+                if (token == null || token.isEmpty()) {
+                    logger.error("WFC: Failed to extract token using selector '{}'", extractSelector);
+                    return null;
+                }
+
+                // Extract duration from body
+                long duration = extractDuration(json);
+
+                // Build the final token value
+                String finalValue = applyTokenTemplate(token, sendTemplate);
+                logger.info("WFC: Token extracted successfully from body (duration: {}s, sendIn: {})", duration, sendIn);
+                return new AuthResult(sendName, finalValue, sendIn, duration);
             }
 
-            // Extract duration from response
-            long duration = extractDuration(json);
-
-            String headerValue = headerPrefix + token;
-            logger.info("WFC: Token extracted successfully (duration: {}s)", duration);
-
-            return new AuthResult(httpHeaderName, headerValue, "header", duration);
+            // For header-extracted tokens, no JSON body to get duration from
+            String finalValue = applyTokenTemplate(token, sendTemplate);
+            logger.info("WFC: Token extracted successfully from header '{}' (sendIn: {})", extractSelector, sendIn);
+            return new AuthResult(sendName, finalValue, sendIn, DEFAULT_DURATION);
 
         } catch (Exception e) {
-            logger.error("WFC: Failed to parse JSON response: {}", e.getMessage());
+            logger.error("WFC: Failed to parse response for token extraction: {}", e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Apply token template to a raw token value.
+     * sendTemplate contains "{token}" placeholder, e.g., "Bearer {token}"
+     */
+    private String applyTokenTemplate(String token, String sendTemplate) {
+        if (sendTemplate != null && !sendTemplate.isEmpty()) {
+            return sendTemplate.replace("{token}", token);
+        }
+        return token;
+    }
+
+    /**
+     * Apply HTTP verb to request builder. Supports all five WFC verbs: POST, GET, PUT, PATCH, DELETE.
+     */
+    private void applyVerb(Request.Builder requestBuilder, String verb, RequestBody body) {
+        switch (verb) {
+            case "POST":   requestBuilder.post(body);   break;
+            case "GET":    requestBuilder.get();         break;
+            case "PUT":    requestBuilder.put(body);     break;
+            case "PATCH":  requestBuilder.patch(body);   break;
+            case "DELETE": requestBuilder.delete(body);  break;
+            default:
+                logger.warn("WFC: Unsupported HTTP verb '{}', defaulting to POST", verb);
+                requestBuilder.post(body);
         }
     }
 

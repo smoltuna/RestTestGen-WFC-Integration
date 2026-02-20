@@ -1,5 +1,5 @@
 specificationFileName: flowable-rest-openapi.json
-host: http://localhost:9092/flowable-rest
+host: http://localhost:8080/flowable-rest
 
 # WFC Authentication - Basic Auth
 authFileName: flowable-rest-auth.yaml

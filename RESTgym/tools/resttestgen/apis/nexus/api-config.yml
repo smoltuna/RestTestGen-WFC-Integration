@@ -1,5 +1,6 @@
 name: nexus
-host: http://localhost:9096
 specificationFileName: nexus-openapi.json
-randomSeed: 12345
+host: "http://localhost:8081"
+
+# WFC Authentication - Basic Auth
 authFileName: nexus-auth.yaml

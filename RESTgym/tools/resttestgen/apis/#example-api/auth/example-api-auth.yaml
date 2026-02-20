@@ -36,12 +36,16 @@ authTemplate:
     verb: POST
     contentType: application/json
     token:
-      # JSON Pointer to extract token from response
-      extractFromField: /token
-      # Header name for the token
-      httpHeaderName: Authorization
-      # Prefix before token value (include trailing space)
-      headerPrefix: "Bearer "
+      # Where to extract token: body or header
+      extractFrom: body
+      # JSON Pointer to extract token from response body (RFC 6901)
+      extractSelector: /token
+      # Where to send the token: header or query
+      sendIn: header
+      # Header/query param name
+      sendName: Authorization
+      # Template with {token} placeholder
+      sendTemplate: "Bearer {token}"
 
 # ============================================================================
 # EXAMPLE 3: JWT with User Signup (signupEndpoint extension)
@@ -64,6 +68,8 @@ authTemplate:
 #     verb: POST
 #     contentType: application/json
 #     token:
-#       extractFromField: /user/token
-#       httpHeaderName: Authorization
-#       headerPrefix: "Token "
+#       extractFrom: body
+#       extractSelector: /user/token
+#       sendIn: header
+#       sendName: Authorization
+#       sendTemplate: "Token {token}"

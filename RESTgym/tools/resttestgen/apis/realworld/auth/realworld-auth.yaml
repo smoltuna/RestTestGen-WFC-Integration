@@ -17,6 +17,8 @@ authTemplate:
     verb: POST
     contentType: application/json
     token:
-      extractFromField: /user/token
-      httpHeaderName: Authorization
-      headerPrefix: "Token "
+      extractFrom: body
+      extractSelector: /user/token
+      sendIn: header
+      sendName: Authorization
+      sendTemplate: "Token {token}"

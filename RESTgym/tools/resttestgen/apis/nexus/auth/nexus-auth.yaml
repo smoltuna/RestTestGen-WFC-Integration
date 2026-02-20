@@ -1,6 +1,6 @@
-# Basic Auth (admin:admin123)
+# Basic Auth (restapitestteam:universe)
 auth:
-  - name: admin
+  - name: restapitestteam
     fixedHeaders:
       - name: Authorization
-        value: Basic YWRtaW46YWRtaW4xMjM=
+        value: Basic cmVzdGFwaXRlc3R0ZWFtOnVuaXZlcnNl

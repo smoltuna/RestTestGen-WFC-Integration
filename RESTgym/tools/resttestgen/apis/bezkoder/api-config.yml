@@ -1,0 +1,3 @@
+name: bezkoder
+specificationFileName: bezkoder-openapi.json
+host: "http://localhost:8080"

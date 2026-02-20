@@ -1322,7 +1322,7 @@
           {
             "name": "includeSource",
             "in": "query",
-            "description": "Also include **source** in addition to **entries** with folder information on the parent node – either the specified parent **nodeId**, or as resolved by **relativePath**.",
+            "description": "Also include **source** in addition to **entries** with folder information on the parent node \u2013 either the specified parent **nodeId**, or as resolved by **relativePath**.",
             "schema": {
               "type": "boolean"
             }
@@ -2067,7 +2067,7 @@
           {
             "name": "name",
             "in": "query",
-            "description": "Optional new name. This should include the file extension.\nThe name must not contain spaces or the following special characters: * \" < > \\ / ? : and |.\nThe character `.` must not be used at the end of the name.\n",
+            "description": "Optional new name. This should include the file\u00a0extension.\nThe name must not contain spaces or the following special characters: * \" < > \\ / ? : and |.\nThe character `.` must not be used at the end of the name.\n",
             "schema": {
               "pattern": "^(?!(.*[\\\"\\*\\\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\\.]?.*[\\.]+$)|(.*[ ]+$))",
               "type": "string"
@@ -2176,7 +2176,7 @@
           "renditions"
         ],
         "summary": "List renditions",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for each rendition of the the file **nodeId**, including the rendition id.\n\nEach rendition returned has a **status**: CREATED means it is available to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for each rendition of the the file **nodeId**, including the rendition id.\n\nEach\u00a0rendition returned has a **status**: CREATED means it is available\u00a0to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
         "operationId": "listRenditions",
         "parameters": [
           {
@@ -3706,7 +3706,7 @@
           "versions"
         ],
         "summary": "List renditions for a file version",
-        "description": "**Note:** this endpoint is available in Alfresco 7.0.0 and newer versions.\n\nGets a list of the rendition information for each rendition of the version of file **nodeId** and **versionId**, including the rendition id.\n\nEach rendition returned has a **status**: CREATED means it is available to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
+        "description": "**Note:** this endpoint is available in Alfresco 7.0.0 and newer versions.\n\nGets a list of the rendition information for each rendition of the version of file **nodeId** and **versionId**, including the rendition id.\n\nEach\u00a0rendition returned has a **status**: CREATED means it is available\u00a0to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
         "operationId": "listVersionRenditions",
         "parameters": [
           {
@@ -4565,7 +4565,7 @@
           "trashcan"
         ],
         "summary": "List renditions for a deleted node",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for each rendition of the file **nodeId**, including the rendition id.\n\nEach rendition returned has a **status**: CREATED means it is available to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for each rendition of the file **nodeId**, including the rendition id.\n\nEach\u00a0rendition returned has a **status**: CREATED means it is available\u00a0to view or download, NOT_CREATED means the rendition can be requested.\n\nYou can use the **where** parameter to filter the returned renditions by **status**. For example, the following **where**\nclause will return just the CREATED renditions:\n\n```\n(status='CREATED')\n```\n",
         "operationId": "listDeletedNodeRenditions",
         "parameters": [
           {
@@ -5251,7 +5251,7 @@
           "people"
         ],
         "summary": "Update person",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nUpdate the given person's details.\n\nYou can use the `-me-` string in place of `<personId>` to specify the currently authenticated user.\n\nIf applicable, the given person's login access can also be optionally disabled or re-enabled.\n\nYou must have admin rights to update a person — unless updating your own details.\n\nIf you are changing your password, as a non-admin user, then the existing password must also\nbe supplied (using the oldPassword field in addition to the new password value).\n\nAdmin users cannot be disabled by setting enabled to false.\n\nNon-admin users may not disable themselves.\n\nYou can set custom properties when you update a person:\n```JSON\n{\n  \"firstName\": \"Alice\",\n  \"properties\":\n  {\n    \"my:property\": \"The value\"\n  }\n}\n```\n**Note:** setting properties of type d:content and d:category are not supported.\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nUpdate the given person's details.\n\nYou can use the `-me-` string in place of `<personId>` to specify the currently authenticated user.\n\nIf applicable, the given person's login access can also be optionally disabled or re-enabled.\n\nYou must have admin rights to update a person \u2014 unless updating your own details.\n\nIf you are changing your password, as a non-admin user, then the existing password must also\nbe supplied (using the oldPassword field in addition to the new password value).\n\nAdmin users cannot be disabled by setting enabled to false.\n\nNon-admin users may not disable themselves.\n\nYou can set custom properties when you update a person:\n```JSON\n{\n  \"firstName\": \"Alice\",\n  \"properties\":\n  {\n    \"my:property\": \"The value\"\n  }\n}\n```\n**Note:** setting properties of type d:content and d:category are not supported.\n",
         "operationId": "updatePerson",
         "parameters": [
           {
@@ -7060,7 +7060,7 @@
           "groups"
         ],
         "summary": "List group memberships",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2.1 and newer versions.\n\n Gets a list of group membership information for person **personId**.\n\n You can use the `-me-` string in place of `<personId>` to specify the currently authenticated user.\n\n You can use the **include** parameter to return additional information.\n\n You can use the **where** parameter to filter the returned groups by **isRoot**. For example, the following **where**\n clause will return just the root groups:\n\n ```\n (isRoot=true)\n ```\n\n The **where** parameter can also be used to filter by ***zone***. This may be combined with isRoot to narrow\n a result set even further. For example, the following where clause will only return groups belonging to the\n `MY.ZONE` zone.\n\n ```\n where=(zones in ('MY.ZONE'))\n ```\n\n This may be combined with the isRoot filter, as shown below:\n\n ```\n where=(isRoot=false AND zones in ('MY.ZONE'))\n ```\n\n ***Note:*** restrictions include\n * `AND` is the only supported operator when combining `isRoot` and `zones` filters\n * Only one zone is supported by the filter\n * The quoted zone name must be placed in parenthesis — a 400 error will result if these are omitted.\n\n\n The default sort order for the returned list is for groups to be sorted by ascending displayName.\n You can override the default by using the **orderBy** parameter. You can specify one or more of the following fields in the **orderBy** parameter:\n * id\n * displayName\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2.1 and newer versions.\n\n Gets a list of group membership information for person **personId**.\n\n You can use the `-me-` string in place of `<personId>` to specify the currently authenticated user.\n\n You can use the **include** parameter to return additional information.\n\n You can use the **where** parameter to filter the returned groups by **isRoot**. For example, the following **where**\n clause will return just the root groups:\n\n ```\n (isRoot=true)\n ```\n\n The **where** parameter can also be used to filter by ***zone***. This may be combined with isRoot to narrow\n a result set even further. For example, the following where clause will only return groups belonging to the\n `MY.ZONE` zone.\n\n ```\n where=(zones in ('MY.ZONE'))\n ```\n\n This may be combined with the isRoot filter, as shown below:\n\n ```\n where=(isRoot=false AND zones in ('MY.ZONE'))\n ```\n\n ***Note:*** restrictions include\n * `AND` is the only supported operator when combining `isRoot` and `zones` filters\n * Only one zone is supported by the filter\n * The quoted zone name must be placed in parenthesis \u2014 a 400 error will result if these are omitted.\n\n\n The default sort order for the returned list is for groups to be sorted by ascending displayName.\n You can override the default by using the **orderBy** parameter. You can specify one or more of the following fields in the **orderBy** parameter:\n * id\n * displayName\n",
         "operationId": "listGroupMembershipsForPerson",
         "parameters": [
           {
@@ -9809,7 +9809,7 @@
           "shared-links"
         ],
         "summary": "List renditions for a shared link",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for the file with shared link identifier **sharedId**.\n\nThis API method returns rendition information, including the rendition id, for each rendition\nwhere the rendition status is CREATED, which means the rendition is available to view/download.\n\n**Note:** No authentication is required to call this endpoint.\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets a list of the rendition information for the file with shared link identifier **sharedId**.\n\nThis API method returns rendition information, including the rendition id, for each rendition\nwhere the rendition status is CREATED, which means the rendition is available\u00a0to view/download.\n\n**Note:** No authentication is required to call this endpoint.\n",
         "operationId": "listSharedLinkRenditions",
         "parameters": [
           {
@@ -9865,7 +9865,7 @@
           "shared-links"
         ],
         "summary": "Get shared link rendition information",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets rendition information for the file with shared link identifier **sharedId**.\n\nThis API method returns rendition information where the rendition status is CREATED,\nwhich means the rendition is available to view/download.\n\n**Note:** No authentication is required to call this endpoint.\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2 and newer versions.\n\nGets rendition information for the file with shared link identifier **sharedId**.\n\nThis API method returns rendition information where the rendition status is CREATED,\nwhich means the rendition is available\u00a0to view/download.\n\n**Note:** No authentication is required to call this endpoint.\n",
         "operationId": "getSharedLinkRendition",
         "parameters": [
           {
@@ -10480,7 +10480,7 @@
           "groups"
         ],
         "summary": "List groups",
-        "description": "**Note:** this endpoint is available in Alfresco 5.2.1 and newer versions.\n\nGets a list of groups.\n\nYou can use the **include** parameter to return additional information.\n\nYou can use the **where** parameter to filter the returned groups by **isRoot**. For example, the following **where**\nclause will return just the root groups:\n\n```\n(isRoot=true)\n```\n\nThe **where** parameter can also be used to filter by ***zone*** and ***displayName***.\nThey may be combined with isRoot to narrow a result set even further. \nFor example, the following where clause will only return groups belonging to the `MY.ZONE` zone.\n\n```\nwhere=(zones in ('MY.ZONE'))\n```\n\nThis may be combined with the isRoot filter, as shown below:\n\n```\nwhere=(isRoot=false AND zones in ('MY.ZONE'))\n```\nThe following where clause will only return groups with displayName `MY.GROUP.NAME`. \n\n```\nwhere=(displayName in ('MY.GROUP.NAME'))\n```\nThis may be combined with the isRoot and zones filter, as shown below:\n\n```\nwhere=(isRoot=false AND displayName in ('MY.GROUP.NAME'))\n```\n\n```\nwhere=(zones in ('MY.ZONE') AND displayName in ('MY.GROUP.NAME'))\n```\n\n```\nwhere=(isRoot=false AND zones in ('MY.ZONE') AND displayName in ('MY.GROUP.NAME'))\n```\n\n***Note:*** restrictions include\n* `AND` is the only supported operator when combining `isRoot`, `zones` and `displayName` filters\n* Only one zone is supported by the filter\n* Only one displayName is supported by the filter\n* The quoted zone name and displayName must be placed in parenthesis — a 400 error will result if these are omitted.\n\nThe default sort order for the returned list is for groups to be sorted by ascending displayName.\nYou can override the default by using the **orderBy** parameter. You can specify one of the following fields in the **orderBy** parameter:\n* id\n* displayName\n",
+        "description": "**Note:** this endpoint is available in Alfresco 5.2.1 and newer versions.\n\nGets a list of groups.\n\nYou can use the **include** parameter to return additional information.\n\nYou can use the **where** parameter to filter the returned groups by **isRoot**. For example, the following **where**\nclause will return just the root groups:\n\n```\n(isRoot=true)\n```\n\nThe **where** parameter can also be used to filter by ***zone*** and ***displayName***.\nThey may be combined with isRoot to narrow a result set even further. \nFor example, the following where clause will only return groups belonging to the `MY.ZONE` zone.\n\n```\nwhere=(zones in ('MY.ZONE'))\n```\n\nThis may be combined with the isRoot filter, as shown below:\n\n```\nwhere=(isRoot=false AND zones in ('MY.ZONE'))\n```\nThe following where clause will only return groups with displayName `MY.GROUP.NAME`. \n\n```\nwhere=(displayName in ('MY.GROUP.NAME'))\n```\nThis may be combined with the isRoot and zones filter, as shown below:\n\n```\nwhere=(isRoot=false AND displayName in ('MY.GROUP.NAME'))\n```\n\n```\nwhere=(zones in ('MY.ZONE') AND displayName in ('MY.GROUP.NAME'))\n```\n\n```\nwhere=(isRoot=false AND zones in ('MY.ZONE') AND displayName in ('MY.GROUP.NAME'))\n```\n\n***Note:*** restrictions include\n* `AND` is the only supported operator when combining `isRoot`, `zones` and `displayName` filters\n* Only one zone is supported by the filter\n* Only one displayName is supported by the filter\n* The quoted zone name and displayName must be placed in parenthesis \u2014 a 400 error will result if these are omitted.\n\nThe default sort order for the returned list is for groups to be sorted by ascending displayName.\nYou can override the default by using the **orderBy** parameter. You can specify one of the following fields in the **orderBy** parameter:\n* id\n* displayName\n",
         "operationId": "listGroups",
         "parameters": [
           {
@@ -15086,7 +15086,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Identifier of the action definition — used for example when executing an action"
+            "description": "Identifier of the action definition \u2014 used for example when executing an action"
           },
           "name": {
             "type": "string",

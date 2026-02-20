@@ -7,12 +7,14 @@ auth:
       payloadRaw: "grant_type=password&client_id=admin-cli&username=admin&password=admin"
 
 authTemplate:
-  baseUrl: http://localhost:9094
+  baseUrl: http://localhost:8080
   loginEndpointAuth:
     endpoint: /realms/master/protocol/openid-connect/token
     verb: POST
     contentType: application/x-www-form-urlencoded
     token:
-      extractFromField: /access_token
-      httpHeaderName: Authorization
-      headerPrefix: "Bearer "
+      extractFrom: body
+      extractSelector: /access_token
+      sendIn: header
+      sendName: Authorization
+      sendTemplate: "Bearer {token}"

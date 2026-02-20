@@ -1,5 +1,5 @@
 name: alfresco
-host: http://localhost:9095
+host: http://localhost:8080
 specificationFileName: alfresco-core-openapi.json
 randomSeed: 12345
 authFileName: alfresco-auth.yaml

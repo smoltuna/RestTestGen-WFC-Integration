@@ -1,0 +1,3 @@
+name: liferay
+specificationFileName: liferay-openapi.json
+host: "http://localhost:8080"

@@ -35,7 +35,7 @@ public class WfcReportWriter extends Writer {
     private static final Logger logger = LogManager.getLogger(WfcReportWriter.class);
     
     // Schema version for WFC Report format
-    private static final String SCHEMA_VERSION = "0.1.0";
+    private static final String SCHEMA_VERSION = "0.2.0";
     private static final String TOOL_NAME = "RestTestGen";
     private static final String TOOL_VERSION = "25.12";
     
