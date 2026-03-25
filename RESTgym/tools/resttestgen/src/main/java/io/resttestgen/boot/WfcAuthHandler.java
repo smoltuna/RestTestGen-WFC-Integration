@@ -531,6 +531,14 @@ public class WfcAuthHandler {
                     }
                 }
                 merged.put("loginEndpointAuth", mergedLogin);
+            } else if ("signupEndpoint".equals(key) && merged.containsKey("signupEndpoint")) {
+                // Deep merge signupEndpoint (template defaults + user overrides)
+                Map<String, Object> mergedSignup = new LinkedHashMap<>(
+                        getMapOrEmpty(merged, "signupEndpoint"));
+                if (value instanceof Map) {
+                    mergedSignup.putAll((Map<String, Object>) value);
+                }
+                merged.put("signupEndpoint", mergedSignup);
             } else if (value != null) {
                 merged.put(key, value);
             }

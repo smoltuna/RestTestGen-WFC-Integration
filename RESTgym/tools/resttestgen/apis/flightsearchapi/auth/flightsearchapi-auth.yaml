@@ -4,14 +4,14 @@
 auth:
   - name: admin
     # Register-then-login workflow
-    registerEndpointAuth:
+    signupEndpoint:
       payloadRaw: '{"email":"admin@test.com","password":"Admin123!","firstName":"Admin","lastName":"User","phoneNumber":"12345678901","userType":"ADMIN"}'
     loginEndpointAuth:
       payloadRaw: '{"email":"admin@test.com","password":"Admin123!"}'
 
 authTemplate:
   baseUrl: http://localhost:8080
-  registerEndpointAuth:
+  signupEndpoint:
     endpoint: /api/v1/authentication/user/register
     verb: POST
     contentType: application/json
