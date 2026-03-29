@@ -1,0 +1,6 @@
+name: nexus
+specificationFileName: nexus-openapi.json
+host: "http://localhost:8081"
+
+# WFC Authentication - Basic Auth
+authFileName: nexus-auth.yaml

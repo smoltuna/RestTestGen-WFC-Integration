@@ -1,0 +1,4 @@
+name: QuartzManager
+specificationFileName: openapi.json
+host: "http://localhost:8080"
+authFileName: quartzmanager-auth.yaml

@@ -1,0 +1,20 @@
+# OAuth2 via OIDC token endpoint
+# IMPORTANT: Using 'admin' account which is protected and cannot be deleted/modified by tests
+# Unlike 'restapitestteam@gmail.com', admin account won't cause authentication loops
+auth:
+  - name: admin
+    loginEndpointAuth:
+      payloadRaw: "grant_type=password&client_id=admin-cli&username=admin&password=admin"
+
+authTemplate:
+  baseUrl: http://localhost:8080
+  loginEndpointAuth:
+    endpoint: /realms/master/protocol/openid-connect/token
+    verb: POST
+    contentType: application/x-www-form-urlencoded
+    token:
+      extractFrom: body
+      extractSelector: /access_token
+      sendIn: header
+      sendName: Authorization
+      sendTemplate: "Bearer {token}"

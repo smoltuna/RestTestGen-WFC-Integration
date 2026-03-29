@@ -30,7 +30,7 @@ fi
 
 echo "Starting mitmproxy..."
 mkdir -p /results/$API/$TOOL/$RUN/logs
-mitmdump -p 9090 --set confdir=/results/$API/$TOOL/$RUN --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/auth.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
+mitmdump -p 9090 --set confdir=/results/$API/$TOOL/$RUN --mode reverse:http://localhost:8080/ -s /infrastructure/mitmproxy/store-interactions.py -s /api/path-rewriter.py > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
 MITM_PID=$!
 
 echo "All services started. Waiting for API process..."

@@ -91,10 +91,25 @@ for i in {1..180}; do
   sleep 2
 done
 
+# Create test user restapitestteam using admin credentials
+echo "Creating test user restapitestteam..."
+curl -s -u admin:admin -X POST "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/people" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "restapitestteam",
+    "firstName": "REST",
+    "lastName": "TestTeam",
+    "displayName": "REST API Test Team",
+    "email": "restapitestteam@gmail.com",
+    "password": "universe",
+    "enabled": true
+  }' && echo "User created successfully" || echo "User may already exist"
+
+sleep 2
+
 echo "Starting mitmproxy..."
 mitmdump -p 9090 --mode reverse:http://localhost:8080/ \
   -s /infrastructure/mitmproxy/store-interactions.py \
-  -s /infrastructure/mitmproxy/auth.py \
   > /results/$API/$TOOL/$RUN/logs/mitmproxy.log 2>&1 &
 MITM_PID=$!
 

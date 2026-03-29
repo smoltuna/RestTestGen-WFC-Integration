@@ -1,0 +1,3 @@
+name: petclinic
+specificationFileName: petclinic-openapi.json
+host: "http://localhost:8080"

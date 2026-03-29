@@ -1,0 +1,8 @@
+# Flowable REST API Authentication Configuration
+# WFC Format for RestTestGen
+
+auth:
+  - name: rest-admin
+    fixedHeaders:
+      - name: Authorization
+        value: Basic cmVzdC1hZG1pbjp0ZXN0

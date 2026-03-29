@@ -1,0 +1,5 @@
+specificationFileName: traccar-openapi.json
+host: http://localhost:8080/api
+
+# WFC Authentication - Basic Auth
+authFileName: traccar-auth.yaml

@@ -1,0 +1,4 @@
+name: gravitee
+specificationFileName: gravitee-openapi.json
+host: "http://localhost:8083"
+authFileName: gravitee-auth.yaml

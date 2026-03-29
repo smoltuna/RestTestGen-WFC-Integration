@@ -20,7 +20,7 @@ RUN apt-get update && \
         python3-pip \
         gnupg \
         unzip && \
-    pip3 install mitmproxy requests pymongo 'bcrypt<4.0.0' && \
+    pip3 install mitmproxy pyyaml requests pymongo 'bcrypt<4.0.0' && \
     apt-get -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

@@ -1,0 +1,75 @@
+# WFC Authentication Configuration for Example API
+#
+# This file is read by wfc-auth.py to obtain authentication credentials.
+#
+# Two authentication methods are supported:
+#   1. fixedHeaders - Pre-encoded static headers (Basic Auth)
+#   2. loginEndpointAuth - Dynamic token via login endpoint (JWT/OAuth)
+
+# ============================================================================
+# EXAMPLE 1: Basic Authentication (fixedHeaders)
+# ============================================================================
+# Use when API accepts HTTP Basic Auth with static credentials.
+# Value is Base64 encoded: echo -n "username:password" | base64
+
+# auth:
+#   - name: admin
+#     fixedHeaders:
+#       - name: Authorization
+#         value: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+
+# ============================================================================
+# EXAMPLE 2: JWT/OAUTH
+# ============================================================================
+# Use when API requires login to obtain a token.
+# The token is extracted from JSON response using JSON Pointer.
+
+auth:
+  - name: default
+    loginEndpointAuth:
+      payloadRaw: '{"username": "testuser", "password": "testpass"}'
+
+authTemplate:
+  baseUrl: http://localhost:9090
+  loginEndpointAuth:
+    endpoint: /api/auth/login
+    verb: POST
+    contentType: application/json
+    token:
+      # Where to extract token: body or header
+      extractFrom: body
+      # JSON Pointer to extract token from response body (RFC 6901)
+      extractSelector: /token
+      # Where to send the token: header or query
+      sendIn: header
+      # Header/query param name
+      sendName: Authorization
+      # Template with {token} placeholder
+      sendTemplate: "Bearer {token}"
+
+# ============================================================================
+# EXAMPLE 3: JWT with User Signup (signupEndpoint extension)
+# ============================================================================
+# Use when API requires user registration before login.
+
+# auth:
+#   - name: user
+#     loginEndpointAuth:
+#       payloadRaw: '{"email": "test@example.com", "password": "secret"}'
+#     signupEndpoint:
+#       endpoint: /api/users/register
+#       verb: POST
+#       contentType: application/json
+#       payloadRaw: '{"email": "test@example.com", "password": "secret", "name": "Test"}'
+#
+# authTemplate:
+#   loginEndpointAuth:
+#     endpoint: /api/users/login
+#     verb: POST
+#     contentType: application/json
+#     token:
+#       extractFrom: body
+#       extractSelector: /user/token
+#       sendIn: header
+#       sendName: Authorization
+#       sendTemplate: "Token {token}"

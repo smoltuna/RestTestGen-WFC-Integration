@@ -1,0 +1,10 @@
+# Keycloak API Configuration for RestTestGen + WFC Auth
+name: keycloak
+
+specificationFileName: openapi.json
+
+# Server URL - localhost for testing
+host: "http://localhost:8080"
+
+# WFC Authentication - OAuth2 via OIDC token endpoint
+authFileName: keycloak-auth.yaml
