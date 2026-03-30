@@ -11,14 +11,9 @@ This repository combines two complementary thesis tracks developed together at t
 
 The thesis source is available in [TesiLatex/tesi.tex](TesiLatex/tesi.tex).
 
-## Project Overview
+## Overview
 
-This project delivers four connected outcomes that make REST API testing output more standardized, comparable, and actionable:
-
-1. REST API benchmark curation: research, selection, and integration of 17 real-world containerized APIs.
-2. Native WFC Authentication support in RestTestGen, including dynamic token-based flows.
-3. WFC fault categorization (F100, F102, F203) mapped from existing oracle failures.
-4. WFC-compliant JSON report generation for cross-tool comparison and CI/CD-friendly automation.
+This project extends [RestTestGen](https://github.com/SeUniVr/RestTestGen), a black-box REST API fuzzer with native support for the [Web Fuzzing Commons (WFC)](https://github.com/WebFuzzing/Commons) standard. The work covers WFC Authentication (and a novel signupEndpoint extension), WFC Fault, WFC report, and a curated  test dataset of 17 Dockerized open-source REST APIs. 
 
 ## Why This Matters
 
