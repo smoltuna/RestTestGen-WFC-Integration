@@ -1,257 +1,199 @@
-# RESTTestGen + WFC Collaborative Integration, Reporting, and Benchmark Curation
+# RESTTestGen + WFC — Collaborative Integration & Benchmark
 
-## Joint Academic Project
+Joint academic project by **Simone Xiao** and **Edoardo Bazzotti**  
+University of Verona — LM-32, A.Y. 2024/2025
 
-All engineering, infrastructure, and experimental work in this repository was developed jointly as a collaborative academic project by **Simone Xiao** and **Edoardo Bazzotti**.
-
-This repository combines two complementary thesis tracks developed together at the University of Verona (LM-32, Academic Year 2024/2025):
-
-1. WFC Authentication integration and evaluation in RestTestGen.
-2. WFC report integration, fault categorization, and benchmark curation for a shared API dataset.
-
-The thesis source is available in [TesiLatex/tesi.tex](TesiLatex/tesi.tex).
+---
 
 ## Overview
 
-This project extends [RestTestGen](https://github.com/SeUniVr/RestTestGen), a black-box REST API fuzzer with native support for the [Web Fuzzing Commons (WFC)](https://github.com/WebFuzzing/Commons) standard. The work covers WFC Authentication (and a novel signupEndpoint extension), WFC Fault, WFC report, and a curated  test dataset of 17 Dockerized open-source REST APIs. 
+This project extends [RestTestGen](https://github.com/SeUniVr/RestTestGen), a black-box REST API fuzzer, with native support for the [Web Fuzzing Commons (WFC)](https://github.com/WebFuzzingCommons) standard. The work covers:
 
-## Why This Matters
+- **WFC Authentication** integration (including a novel `signupEndpoint` extension)
+- **WFC Fault** categorization and end-to-end **WFC Report** integration in RestTestGen
+- A curated benchmark of **17 Dockerized open-source REST APIs**
 
-The REST API testing ecosystem is still fragmented:
+---
 
-- tools output incompatible formats, making systematic comparisons difficult;
-- failure semantics are often missing (fail/error without a shared fault meaning);
-- benchmark selection is inconsistent across studies.
+## Context
 
-There is also a strong authentication gap in literature:
+The REST API testing ecosystem is fragmented: tools produce incompatible outputs, fault semantics are inconsistent, and benchmark selection varies across studies. Authentication support is particularly weak — of 23 fuzzers surveyed, only 6 support dynamic authentication at runtime, and those typically rely on tool-specific scripts.
 
-- among 23 fuzzers surveyed, 12 support only static authentication;
-- roughly the other half does not support authentication at all;
-- only 6 support dynamic authentication (runtime token retrieval);
-- even among those 6, many rely on custom Python scripts tied to one tool.
+WFC Authentication (introduced September 2025 by the EvoMaster group) addresses this with a declarative, tool-agnostic format. Before this project, EvoMaster was the only fuzzer with native support. This work adds native WFC support to RestTestGen, alongside Schemathesis, which has recently announced it as well.
 
-The result is poor portability and weaker reproducibility. WFC Authentication addresses this by introducing a shared, declarative, tool-agnostic configuration format.
+---
 
-## Why WFC, Why Now
+## What Was Built
 
-- WFC Authentication was introduced by the EvoMaster research group in September 2025.
-- Before this collaborative project, EvoMaster was the only fuzzer with native support.
-- This project adds native WFC support to RestTestGen.
-- Schemathesis, one of the most popular fuzzers on GitHub, has recently announced WFC support.
+### 1. Benchmark Curation
+- 41 candidate APIs investigated; **17 integrated**, 24 rejected with documented reasons
+- Selection criteria: Java compatibility, OpenAPI quality, Docker reproducibility, runtime stability
+- Domains: IAM, BPM, API management, healthcare, finance, social, tracking, and more
 
-This positions RestTestGen among the earliest tools entering the WFC ecosystem and highlights strong momentum around the standard.
+### 2. Infrastructure
+- Per-API Dockerization with Java runtime compatibility and startup health checks
+- **JaCoCo** instrumentation for code coverage
+- **mitmproxy** for full HTTP interaction capture
+- Auth configs, dictionaries, and setup scripts per API
 
-## What We Built
-
-### 1) Benchmark Research, Selection, and Curation
-
-- 41 candidate APIs investigated from GitHub, curated OpenAPI lists, and enterprise OSS sources.
-- 17 APIs integrated into this repository dataset, 24 rejected with documented technical reasons.
-- Selection criteria included Java compatibility, OpenAPI quality, Docker reproducibility, and runtime stability.
-- Final benchmark spans broad domains (IAM, BPM, API management, tracking, healthcare, finance, social, and more).
-- Structural range is wide (from very small APIs to large enterprise interfaces).
-
-### 2) Dockerization and Observability Infrastructure
-
-- Per-API Dockerization with Java runtime compatibility and startup health checks.
-- JaCoCo instrumentation for code coverage.
-- mitmproxy integration for full HTTP interaction capture.
-- API-specific auth configs, dictionaries, and setup scripts integrated into the repository layout.
-
-### 3) WFC Authentication Integration in RestTestGen
-
-Implemented native Java components:
-
-- WfcAuthHandler: parses auth.yaml, executes signup/login requests, extracts tokens.
-- WfcAuthInfo: tracks token state, expiry, retries, and fallback mode.
+### 3. WFC Authentication (RestTestGen)
+Java components implemented:
+- `WfcAuthHandler` — parses `auth.yaml`, executes signup/login, extracts tokens
+- `WfcAuthInfo` — tracks token state, expiry, retries, fallback mode
 
 Supported flows:
+- Basic authentication (fixed headers)
+- JWT and OAuth2 ROPC login endpoint flows
+- `signupEndpoint` extension for APIs requiring registration before login
+- Automatic token refresh and graceful fallback to unauthenticated mode
 
-- Basic authentication (fixed headers).
-- JWT and OAuth2 ROPC login endpoint flows.
-- signupEndpoint extension for APIs that require registration before login.
+### 4. WFC Fault Categorization
 
-Robustness behavior:
+| Oracle | Condition | WFC Category |
+|---|---|---|
+| StatusCodeOracle | HTTP 5xx | F100 — server error |
+| ErrorStatusCodeOracle | 2xx on invalid input | F102 — validation bypass |
+| ErrorStatusCodeOracle | 5xx on invalid input | F100 — server error |
+| MassAssignmentOracle | Protected field persisted | F203 — mass assignment |
 
-- automatic token refresh;
-- controlled fallback to unauthenticated mode after repeated failures, so campaigns continue instead of terminating early.
+A conservative fallback ensures uncaptured 5xx responses are always classified as F100.
 
-### 4) WFC Fault Categorization Mapping
+### 5. WFC Report Generation
+- `WfcReportWriter` generates JSON output aligned with WFC schema v0.2.0
+- Integrated at end-of-session with minimal impact on existing orchestration
+- Produces a single machine-readable artifact per run (`wfc-report.json`) with faults, REST problem details, and coverage extras
+- Completes the pipeline from oracle verdicts to standardized report output (`oracle -> category -> WFC JSON`)
 
-Existing oracles were extended to enrich failure outputs with WFC categories without changing verdict logic:
+---
 
-| Oracle | Condition | WFC Category | Meaning |
-| --- | --- | --- | --- |
-| StatusCodeOracle | HTTP 5xx observed | F100 | Server error |
-| ErrorStatusCodeOracle | 2xx on invalid input | F102 | Validation/schema bypass |
-| ErrorStatusCodeOracle | 5xx on invalid input | F100 | Server error during error fuzzing |
-| MassAssignmentOracle | Protected field persisted | F203 | Mass assignment vulnerability |
+## Dataset
 
-A conservative fallback also classifies uncaptured HTTP 5xx as F100, ensuring server errors are not silently dropped.
+**17 containerized APIs total:**
+`alfresco`, `bezkoder`, `cassandra-management-api`, `erc20`, `flightsearchapi`, `flowable-process`, `gestaohospitalar`, `gravitee`, `kafka-rest`, `keycloak`, `nexus`, `notebookmanager`, `petclinic`, `quartzmanager`, `realworld-backend-micronaut`, `spring-kafka-publisher`, `traccar`
 
-### 5) WFC-Compliant Report Generation
+**9 with WFC Authentication configurations:**
+`alfresco`, `flightsearchapi`, `flowable-process`, `gravitee`, `keycloak`, `nexus`, `quartzmanager`, `realworld-backend-micronaut`, `traccar`
 
-- Implemented WfcReportWriter to generate JSON output aligned with WFC schema v0.2.0.
-- Integrated at end-of-session reporting with minimal invasiveness to existing orchestration.
-- Output is parseable, comparable, and suitable for automated pipelines.
+---
 
-## Dataset Scope and Context
+## Results
 
-- Total curated dataset: 17 containerized APIs.
+### Authentication impact (WFC Auth vs. no-auth)
 
-### Complete API List (17)
+| API | No Auth | With Auth |
+|---|---|---|
+| Flowable | 0 | 1410 faults |
+| Keycloak | 0 | 698 faults |
+| Traccar | 0 | 289 faults |
+| QuartzManager | 0 | 286 faults |
+| Alfresco | 65 | 296 (+355%) |
+| RealWorld | 133 | 471 (+254%) |
+| Nexus | 99 total (6 F100, 93 F102) | 30 total (30 F100, 0 F102) |
 
-- alfresco
-- bezkoder
-- cassandra-management-api
-- erc20
-- flightsearchapi
-- flowable-process
-- gestaohospitalar
-- gravitee
-- kafka-rest
-- keycloak
-- nexus
-- notebookmanager
-- petclinic
-- quartzmanager
-- realworld-backend-micronaut
-- spring-kafka-publisher
-- traccar
+> Nexus shows that total fault counts alone can be misleading — category-level analysis reveals a qualitative shift toward more severe faults.
 
-### APIs with WFC Authentication Configurations (9)
+### WFC Reporting baseline (17 APIs)
 
-- alfresco
-- flightsearchapi
-- flowable-process
-- gravitee
-- keycloak
-- nexus
-- quartzmanager
-- realworld-backend-micronaut
-- traccar
+- 16/17 APIs completed (Gravitee excluded: OOM)
+- **33,461 faults** detected total — 70% F100, 30% F102
+- Mean status-code coverage: **48.7%**
 
-### Why 9 Auth APIs Is Significant
+### Mutation testing (10 APIs, 5 mutants)
 
-For auth-focused experimental studies, 9 APIs is strong relative to typical literature baselines:
+In this thesis, a **mutant** is a small, intentional code change in RestTestGen used to simulate a realistic regression and verify whether the testing/reporting pipeline detects it.
 
-- early RESTler evaluation: 2 APIs;
-- early EvoMaster evaluation: 3 APIs;
-- APIRL and Morest (ICSE/AAAI context): around 6 APIs;
-- this collaborative project: 9 auth-enabled APIs, plus 17 curated APIs overall.
+- A mutant is **killed** when it causes a measurable behavioral shift compared to baseline runs.
+- A mutant **survives** when differences stay within noise or no observable impact appears.
+- A mutant is **equivalent** when the change is not observable for a given API/context.
 
-## Experimental Highlights
+All mutants were executed one-at-a-time to isolate effects:
 
-### A) Authentication Impact (WFC Auth vs no-auth)
+| Mutant | Changed component | Intent | Kill rate |
+|---|---|---|---|
+| M1 | `StatusCodeOracle` | Turn 5xx into `UNKNOWN` to stress F100 detection | 100% |
+| M2 | `ErrorStatusCodeOracle` | Turn 2xx on invalid input into `PASS` to suppress F102 | 100% |
+| M3 | `ErrorFuzzer` | Remove one mutator to reduce error-generation diversity | 78% |
+| M4 | `Value provider` | Disable enum/example priority to degrade input semantics | 70% |
+| M5 | `NominalFuzzer` | Force inclusion of all optional parameters | 100% |
 
-Large effects on fully protected APIs:
+This mutation campaign validates both detection sensitivity and fault-category stability under controlled regressions.
 
-- Flowable: 0 -> 1410 faults
-- Traccar: 0 -> 289 faults
-- Keycloak: 0 -> 698 faults
-- QuartzManager: 0 -> 286 faults
+---
 
-Substantial gains on partially public APIs:
+## Stack
 
-- Alfresco: 65 -> 296 faults (+355%)
-- RealWorld: 133 -> 471 faults (+254%)
+| Layer | Technology |
+|---|---|
+| Fuzzer | RestTestGen (Java) |
+| Containerization | Docker |
+| Coverage | JaCoCo |
+| Traffic capture | mitmproxy |
+| Auth standard | WFC Authentication (auth.yaml) |
+| Report standard | WFC Report schema v0.2.0 |
+| API specs | OpenAPI 3.x |
 
-Nexus qualitative shift:
-
-- total faults decreased (99 -> 30),
-- but severe F100 increased (6 -> 30),
-- weaker F102 disappeared (93 -> 0).
-
-This shows that category-level analysis is essential; total fault counts alone can be misleading.
-
-### B) WFC Reporting and Categorization Track
-
-- Baseline campaign: 17 APIs launched, 16 completed (Gravitee excluded due to OOM).
-- 33461 faults detected overall.
-- Distribution: 70% F100, 30% F102.
-- Mean status-code coverage: 48.7%.
-
-Mutation-testing summary (10 APIs, 5 mutants):
-
-- M1, M2, M5: 100% kill rate.
-- M3: 78% kill rate.
-- M4: 70% kill rate.
-
-These results provide evidence that the semantic categorization pipeline is sensitive to regressions and robust enough for comparative experimentation.
+---
 
 ## Repository Layout
+```
+apis/                  # API Dockerfiles and dataset assets
+tools/resttestgen/     # RestTestGen source, configs, runners
+OAS/                   # OpenAPI specs
+TesiLatex/             # Thesis source (tesi.tex)
+```
 
-- `apis/`: API Dockerfiles and dataset assets.
-- `tools/resttestgen/`: RestTestGen source, configs, and runners.
-- `OAS/`: OpenAPI assets used in the project.
-- `TesiLatex/`: thesis sources and manuscript materials.
+---
 
-## Quick Start (Standalone: API Containers + RestTestGen)
+## Quick Start
 
-This quick start intentionally uses only API Dockerfiles plus RestTestGen.
-
-Important: `apiUnderTest` must match a directory in `tools/resttestgen/apis` (for example `keycloak`, `petclinic`, `flowable-rest`, `realworld`).
-
-1. Create a dedicated Docker bridge network (one-time setup).
-
+### 1. Create a Docker bridge network
 ```bash
 docker network create rtg-network 2>/dev/null || true
 ```
 
-2. Build and run one API container on that network (example: keycloak).
-
+### 2. Build and run an API (example: keycloak)
 ```bash
-cd <project-root>
-
 docker build -f apis/keycloak/Dockerfile -t keycloak-api .
 docker rm -f keycloak 2>/dev/null || true
-docker run -d \
-	--name keycloak \
-	--network rtg-network \
-	-p 8080:8080 \
-	keycloak-api
+docker run -d --name keycloak --network rtg-network -p 8080:8080 keycloak-api
 ```
 
-3. Configure RestTestGen target API and host.
+### 3. Configure RestTestGen
 
 In `tools/resttestgen/rtg-config.yml`:
-
 ```yaml
 apiUnderTest: keycloak
 ```
 
 In `tools/resttestgen/apis/keycloak/api-config.yml`:
-
 ```yaml
 host: "http://keycloak:8080"
 ```
 
-4. Build and run RestTestGen on the same Docker network.
-
+### 4. Build and run RestTestGen
 ```bash
-cd <project-root>/tools/resttestgen
+cd tools/resttestgen
 
 docker build -t rtg .
 docker run --rm \
-	--network rtg-network \
-	-v "$PWD/apis:/app/apis" \
-	-v "$PWD/rtg-config.yml:/app/rtg-config.yml" \
-	-v "$PWD/strategy-config.yml:/app/strategy-config.yml" \
-	rtg
+  --network rtg-network \
+  -v "$PWD/apis:/app/apis" \
+  -v "$PWD/rtg-config.yml:/app/rtg-config.yml" \
+  -v "$PWD/strategy-config.yml:/app/strategy-config.yml" \
+  rtg
 ```
 
-5. Read results in `tools/resttestgen/apis/keycloak/results`.
+### 5. Read results
+```
+tools/resttestgen/apis/keycloak/results/
+```
 
-Optional for host-side inspection/debugging only:
+For authenticated targets, choose one of the 9 WFC-configured APIs and set `host: "http://<container-name>:8080"` in its `api-config.yml`.
 
-- publish `-p 9090:9090` to inspect proxy traffic from the host;
-- publish `-p 12345:12345` only if you need external JaCoCo TCP access;
-- set `-e TOOL=rtg -e RUN=1` only to customize API container output folder naming.
+---
 
-For authenticated targets, choose one of the WFC-configured APIs listed above, run its API container on `rtg-network`, and set the matching `host` in the corresponding `api-config.yml` to `http://<container-name>:8080` (or `:9090` if you intentionally route RTG through the proxy).
+## Notes
 
-## Notes and Current Limits
-
-- Dataset and images are large (storage and bandwidth planning needed).
-- Gravitee is a known scaling ceiling in current resource settings (timeout/OOM risk on long runs).
-- Operationalized WFC categories currently cover F100, F102, F203; additional categories are modeled for future oracle extensions.
+- Gravitee has known OOM/timeout risk on long runs
+- WFC fault categories currently cover F100, F102, F203; additional categories are planned
+- Dataset images are large — plan storage and bandwidth accordingly
