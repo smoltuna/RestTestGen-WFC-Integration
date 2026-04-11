@@ -1,7 +1,4 @@
-# RESTTestGen + WFC — Collaborative Integration & Benchmark
-
-Joint academic project by **Simone Xiao** and **Edoardo Bazzotti**  
-University of Verona — LM-32, A.Y. 2024/2025
+# RESTTestGen - WFC Integration & Benchmark
 
 ---
 
@@ -197,3 +194,10 @@ For authenticated targets, choose one of the 9 WFC-configured APIs and set `host
 - Gravitee has known OOM/timeout risk on long runs
 - WFC fault categories currently cover F100, F102, F203; additional categories are planned
 - Dataset images are large — plan storage and bandwidth accordingly
+
+--- 
+
+## Authors
+
+Simone Xiao, Edoardo Bazzotti
+
