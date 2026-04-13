@@ -131,16 +131,6 @@ This mutation campaign validates both detection sensitivity and fault-category s
 
 ---
 
-## Repository Layout
-```
-apis/                  # API Dockerfiles and dataset assets
-tools/resttestgen/     # RestTestGen source, configs, runners
-OAS/                   # OpenAPI specs
-TesiLatex/             # Thesis source (tesi.tex)
-```
-
----
-
 ## Quick Start
 
 ### 1. Create a Docker bridge network
@@ -186,14 +176,6 @@ tools/resttestgen/apis/keycloak/results/
 ```
 
 For authenticated targets, choose one of the 9 WFC-configured APIs and set `host: "http://<container-name>:8080"` in its `api-config.yml`.
-
----
-
-## Notes
-
-- Gravitee has known OOM/timeout risk on long runs
-- WFC fault categories currently cover F100, F102, F203; additional categories are planned
-- Dataset images are large — plan storage and bandwidth accordingly
 
 --- 
 
